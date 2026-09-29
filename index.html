@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PB's Tool — Legal &amp; Business Document Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16233A;
+  --ink-2:#1F324C;
+  --ink-soft:#2C4262;
+  --paper:#FAF8F3;
+  --paper-2:#F1ECE0;
+  --card:#FFFFFF;
+  --brass:#A9812F;
+  --brass-dark:#8A6A24;
+  --brass-light:#E9DBB8;
+  --slate:#5A6472;
+  --slate-light:#8992A0;
+  --line:#E2DBC9;
+  --line-dark:#33455F;
+  --success:#2E7D5B;
+  --success-bg:#E7F3ED;
+  --danger:#B3432B;
+  --danger-bg:#FBEAE5;
+  --warn:#9C7A1E;
+  --warn-bg:#FBF3DF;
+  --shadow: 0 1px 2px rgba(22,35,58,.06), 0 8px 24px rgba(22,35,58,.06);
+  --radius: 4px;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --serif: 'Lora', Georgia, 'Times New Roman', serif;
+  --mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+::selection{background:var(--brass-light);}
+a{color:inherit;}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+
+/* ---------- App shell ---------- */
+.app{display:flex;min-height:100vh;}
+
+.sidebar{
+  width:248px;flex:none;background:var(--ink);color:#DCE3EE;
+  display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.brand{
+  padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:11px;
+}
+.brand-mark{
+  width:34px;height:34px;border:1.5px solid var(--brass);border-radius:2px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-weight:700;color:var(--brass);font-size:16px;flex:none;
+}
+.brand-text .brand-name{font-family:var(--serif);font-weight:600;font-size:16.5px;color:#fff;line-height:1.15;}
+.brand-text .brand-sub{font-size:10.5px;color:#93A2BA;letter-spacing:.03em;margin-top:2px;}
+
+.nav{padding:14px 12px;flex:1;}
+.nav-group-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:#63738F;padding:14px 10px 6px;font-weight:600;}
+.nav-group-label:first-child{padding-top:4px;}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:5px;
+  font-size:13.5px;color:#C4CDDC;text-decoration:none;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;
+}
+.nav-item svg{flex:none;opacity:.85;}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+.nav-item.active{background:var(--ink-soft);color:#fff;box-shadow:inset 2px 0 0 var(--brass);}
+.nav-item .count{margin-left:auto;font-size:11px;color:#8091AC;background:rgba(255,255,255,.07);padding:1px 7px;border-radius:10px;}
+
+.sidebar-foot{padding:14px 20px;border-top:1px solid rgba(255,255,255,.08);font-size:11px;color:#7284A0;}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{
+  display:flex;align-items:center;gap:16px;padding:14px 28px;background:var(--card);
+  border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;
+}
+.topbar h1{font-family:var(--serif);font-size:19px;font-weight:600;margin:0;color:var(--ink);}
+.topbar .path{font-size:12px;color:var(--slate-light);margin-top:1px;}
+.topbar-search{
+  margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--paper-2);
+  border:1px solid var(--line);border-radius:6px;padding:7px 12px;min-width:230px;
+}
+.topbar-search input{border:none;background:none;outline:none;font-size:13px;width:100%;color:var(--ink);}
+.btn-new{
+  background:var(--brass);color:#fff;border:none;border-radius:6px;padding:9px 16px;
+  font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;white-space:nowrap;
+}
+.btn-new:hover{background:var(--brass-dark);}
+
+.view{padding:26px 30px 60px;max-width:1180px;}
+.view[hidden]{display:none;}
+
+/* ---------- Generic components ---------- */
+.section-title{font-family:var(--serif);font-size:17px;font-weight:600;margin:0 0 4px;color:var(--ink);}
+.section-sub{font-size:13px;color:var(--slate);margin:0 0 18px;}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);}
+.card-pad{padding:20px;}
+
+.grid{display:grid;gap:16px;}
+.grid-4{grid-template-columns:repeat(4,1fr);}
+.grid-3{grid-template-columns:repeat(3,1fr);}
+.grid-2{grid-template-columns:repeat(2,1fr);}
+@media(max-width:980px){.grid-4{grid-template-columns:repeat(2,1fr);}.grid-3{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:640px){.grid-4,.grid-3,.grid-2{grid-template-columns:1fr;}}
+
+.stat-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 16px;position:relative;overflow:hidden;}
+.stat-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brass);}
+.stat-num{font-family:var(--serif);font-size:30px;font-weight:600;color:var(--ink);line-height:1;}
+.stat-label{font-size:12.5px;color:var(--slate);margin-top:7px;}
+
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:9px 15px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:7px;}
+.btn:hover{border-color:var(--slate-light);}
+.btn-primary{background:var(--ink);border-color:var(--ink);color:#fff;}
+.btn-primary:hover{background:var(--ink-soft);}
+.btn-brass{background:var(--brass);border-color:var(--brass);color:#fff;}
+.btn-brass:hover{background:var(--brass-dark);}
+.btn-danger{color:var(--danger);border-color:var(--danger-bg);}
+.btn-danger:hover{background:var(--danger-bg);}
+.btn-ghost{border-color:transparent;background:none;}
+.btn-ghost:hover{background:var(--paper-2);}
+.btn-sm{padding:6px 11px;font-size:12px;}
+.btn[disabled]{opacity:.45;pointer-events:none;}
+
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;letter-spacing:.02em;}
+.pill-draft{background:var(--warn-bg);color:var(--warn);}
+.pill-final{background:var(--success-bg);color:var(--success);}
+
+.doc-type-card{
+  border:1px solid var(--line);background:var(--card);border-radius:var(--radius);padding:16px;
+  display:flex;flex-direction:column;gap:9px;text-align:left;border-top:3px solid var(--brass-light);
+}
+.doc-type-card:hover{border-top-color:var(--brass);box-shadow:var(--shadow);}
+.doc-type-card .dt-icon{font-family:var(--serif);font-weight:700;color:var(--brass-dark);font-size:13px;letter-spacing:.02em;}
+.doc-type-card h3{margin:0;font-size:14.5px;font-family:var(--serif);font-weight:600;color:var(--ink);}
+.doc-type-card p{margin:0;font-size:12px;color:var(--slate);line-height:1.5;}
+.doc-type-card .dt-go{font-size:12px;font-weight:600;color:var(--brass-dark);margin-top:auto;}
+
+table{border-collapse:collapse;width:100%;}
+.table th,.table td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--line);text-align:left;}
+.table th{color:var(--slate);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;background:var(--paper-2);}
+.table tr:hover td{background:#FCFBF8;}
+.empty-state{padding:48px 20px;text-align:center;color:var(--slate);}
+.empty-state .es-icon{font-size:30px;margin-bottom:10px;opacity:.5;}
+.empty-state h4{font-family:var(--serif);color:var(--ink);margin:0 0 6px;font-size:15px;}
+.empty-state p{margin:0 0 16px;font-size:13px;}
+
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:6px;}
+.field label .req{color:var(--danger);margin-left:2px;}
+.field .hint{font-size:11.5px;color:var(--slate-light);margin-top:5px;}
+.field input,.field select,.field textarea{
+  width:100%;border:1px solid var(--line);border-radius:5px;padding:9px 11px;font-size:13.5px;
+  color:var(--ink);background:#fff;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--brass);outline:none;}
+.field textarea{min-height:80px;resize:vertical;font-family:inherit;}
+.field.error input,.field.error select,.field.error textarea{border-color:var(--danger);background:var(--danger-bg);}
+.field .error-msg{font-size:11.5px;color:var(--danger);margin-top:5px;display:none;}
+.field.error .error-msg{display:block;}
+
+/* ---------- Wizard ---------- */
+.stepper{display:flex;align-items:center;margin-bottom:26px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 20px;overflow-x:auto;}
+.step{display:flex;align-items:center;gap:9px;white-space:nowrap;color:var(--slate-light);}
+.step .num{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;flex:none;}
+.step .lbl{font-size:12.5px;font-weight:600;}
+.step.active .num{background:var(--brass);border-color:var(--brass);color:#fff;}
+.step.active .lbl{color:var(--ink);}
+.step.done .num{background:var(--ink);border-color:var(--ink);color:#fff;}
+.step.done{color:var(--ink);}
+.step-sep{flex:1;height:1px;background:var(--line);margin:0 12px;min-width:20px;}
+
+.wizard-body{display:grid;grid-template-columns:1fr;gap:20px;}
+.party-block{border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px;background:var(--paper-2);position:relative;}
+.party-block .party-head{display:flex;align-items:center;justify-content:between;margin-bottom:12px;}
+.party-block .party-head h4{margin:0;font-family:var(--serif);font-size:14px;color:var(--ink);}
+.party-block .remove-party{margin-left:auto;}
+.field-row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:700px){.field-row2{grid-template-columns:1fr;}}
+
+.clause-list{display:flex;flex-direction:column;gap:10px;}
+.clause-item{border:1px solid var(--line);border-radius:var(--radius);background:var(--card);padding:13px 14px;}
+.clause-item .ci-top{display:flex;align-items:flex-start;gap:11px;}
+.clause-item input[type=checkbox]{margin-top:3px;width:16px;height:16px;accent-color:var(--brass);flex:none;}
+.clause-item .ci-title{font-weight:600;font-size:13.5px;color:var(--ink);flex:1;}
+.clause-item .ci-actions{display:flex;gap:4px;}
+.clause-item .ci-text{font-size:12.5px;color:var(--slate);margin-top:8px;line-height:1.55;padding-left:27px;}
+.clause-item .ci-text textarea{width:100%;min-height:70px;font-size:12.5px;}
+.icon-btn{border:none;background:none;color:var(--slate-light);padding:4px 6px;border-radius:4px;font-size:12px;}
+.icon-btn:hover{background:var(--paper-2);color:var(--ink);}
+
+.wizard-actions{display:flex;justify-content:space-between;margin-top:22px;padding-top:18px;border-top:1px solid var(--line);}
+
+/* ---------- Document preview (paper) ---------- */
+.doc-page{
+  background:#fff;max-width:800px;margin:0 auto;padding:56px 60px;border:1px solid var(--line);
+  box-shadow:var(--shadow);font-family:var(--serif);color:#1a1a1a;line-height:1.7;font-size:14.2px;position:relative;
+}
+.doc-page::before,.doc-page::after{content:"";position:absolute;width:16px;height:16px;border:1.5px solid var(--brass-light);}
+.doc-page::before{top:14px;left:14px;border-right:none;border-bottom:none;}
+.doc-page::after{bottom:14px;right:14px;border-left:none;border-top:none;}
+.doc-title{text-align:center;font-size:19px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;margin-bottom:4px;}
+.doc-subtitle{text-align:center;font-size:11.5px;color:#666;font-family:var(--sans);letter-spacing:.04em;margin-bottom:26px;}
+.doc-section-h{font-size:13.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin:26px 0 10px;border-bottom:1px solid #ddd;padding-bottom:5px;}
+.doc-page p{margin:0 0 12px;text-align:justify;}
+.doc-page ol{padding-left:22px;margin:0 0 12px;}
+.doc-page ol li{margin-bottom:10px;text-align:justify;}
+.doc-page .party-line{margin-bottom:6px;}
+.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:18px;}
+.sig-block{margin-bottom:26px;font-size:13px;}
+.sig-line{border-bottom:1px solid #333;height:34px;margin-bottom:5px;}
+.sig-cap{font-size:11.5px;color:#444;font-family:var(--sans);}
+.doc-num-tag{font-family:var(--mono);font-size:10.5px;color:#888;text-align:right;margin-bottom:14px;}
+@media(max-width:860px){.doc-page{padding:34px 22px;}.sig-grid{grid-template-columns:1fr;}}
+
+.preview-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+
+/* ---------- Toast / Modal ---------- */
+#toastHost{position:fixed;right:20px;bottom:20px;display:flex;flex-direction:column;gap:8px;z-index:999;}
+.toast{background:var(--ink);color:#fff;padding:11px 16px;border-radius:6px;font-size:13px;box-shadow:var(--shadow);display:flex;align-items:center;gap:9px;min-width:220px;animation:toastIn .25s ease;}
+.toast.success{background:var(--success);}
+.toast.error{background:var(--danger);}
+.toast.warn{background:var(--warn);}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(22,35,58,.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+.modal-overlay[hidden]{display:none;}
+.modal-box{background:#fff;border-radius:8px;max-width:420px;width:100%;padding:24px;box-shadow:var(--shadow);}
+.modal-box h3{margin:0 0 10px;font-family:var(--serif);font-size:16.5px;}
+.modal-box p{font-size:13.5px;color:var(--slate);margin:0 0 20px;line-height:1.6;}
+.modal-actions{display:flex;justify-content:flex-end;gap:9px;}
+
+.disclaimer-bar{
+  background:var(--paper-2);border:1px solid var(--brass-light);border-left:3px solid var(--brass);
+  border-radius:4px;padding:12px 16px;font-size:12px;color:var(--slate);margin-bottom:20px;line-height:1.6;
+}
+.disclaimer-bar strong{color:var(--ink);}
+
+.tag-input-row{display:flex;gap:8px;margin-bottom:14px;}
+.tag-input-row input{flex:1;}
+.custom-clause-list{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+.filter-bar select,.filter-bar input{border:1px solid var(--line);border-radius:5px;padding:8px 10px;font-size:13px;}
+
+.badge-code{font-family:var(--mono);font-size:11px;background:var(--paper-2);padding:2px 6px;border-radius:3px;color:var(--slate);}
+
+@media print{
+  body *{visibility:hidden;}
+  #printArea,#printArea *{visibility:visible;}
+  #printArea{position:absolute;left:0;top:0;width:100%;}
+  .doc-page{box-shadow:none;border:none;max-width:100%;padding:20px 40px;}
+  .doc-page::before,.doc-page::after{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">PB</div>
+      <div class="brand-text">
+        <div class="brand-name">PB's Tool</div>
+        <div class="brand-sub">Document Drafting Suite</div>
+      </div>
+    </div>
+    <nav class="nav" id="navList">
+      <div class="nav-group-label">Workspace</div>
+      <button class="nav-item" data-view="dashboard">‣ Dashboard</button>
+      <button class="nav-item" data-view="create">‣ Create New Document</button>
+      <button class="nav-item" data-view="templates">‣ Document Templates</button>
+      <button class="nav-item" data-view="clauses">‣ Clause Library</button>
+      <div class="nav-group-label">Library</div>
+      <button class="nav-item" data-view="saved">‣ Saved Documents <span class="count" id="cntSaved">0</span></button>
+      <button class="nav-item" data-view="recent">‣ Recent Documents</button>
+      <button class="nav-item" data-view="search">‣ Search</button>
+      <div class="nav-group-label">System</div>
+      <button class="nav-item" data-view="settings">‣ Settings</button>
+    </nav>
+    <div class="sidebar-foot">v1.0 · Runs entirely in your browser<br>No data leaves this device.</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="topbarTitle">Dashboard</h1>
+        <div class="path" id="topbarPath">Workspace / Dashboard</div>
+      </div>
+      <div class="topbar-search">
+        <span>⌕</span>
+        <input type="text" id="quickSearch" placeholder="Search documents, clauses, templates…">
+      </div>
+      <button class="btn-new" id="btnNewDoc">+ New Document</button>
+    </div>
+
+    <!-- ============ DASHBOARD ============ -->
+    <section class="view" id="view-dashboard">
+      <div class="disclaimer-bar">
+        <strong>Disclaimer:</strong> PB's Tool generates document drafts based on user-provided information and selected templates. It does not constitute legal advice. Documents should be reviewed and customized by a qualified legal professional before signing, execution or filing.
+      </div>
+      <div class="grid grid-4" id="dashStats" style="margin-bottom:26px;"></div>
+
+      <div class="card card-pad" style="margin-bottom:22px;">
+        <div class="section-title">Document Categories</div>
+        <div class="section-sub">16 ready-to-use categories, each with a smart questionnaire and structured template.</div>
+        <div class="grid grid-4" id="dashCategories"></div>
+      </div>
+
+      <div class="card card-pad">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+          <div class="section-title" style="margin-bottom:0;">Recent Activity</div>
+          <button class="btn btn-ghost btn-sm" data-view-link="recent">View all →</button>
+        </div>
+        <div class="section-sub">Documents you last created or edited.</div>
+        <div id="dashRecentTable"></div>
+      </div>
+    </section>
+
+    <!-- ============ CREATE / WIZARD ============ -->
+    <section class="view" id="view-create">
+      <div id="createIntro">
+        <div class="section-title">Create a New Document</div>
+        <div class="section-sub">Choose a document type to begin the guided drafting workflow.</div>
+        <div class="grid grid-4" id="createTypeGrid"></div>
+      </div>
+
+      <div id="wizardWrap" hidden>
+        <div class="stepper" id="stepperBar"></div>
+        <div class="wizard-body" id="wizardBody"></div>
+      </div>
+    </section>
+
+    <!-- ============ TEMPLATES ============ -->
+    <section class="view" id="view-templates">
+      <div class="section-title">Document Templates</div>
+      <div class="section-sub">Browse all 16 supported document categories and jump straight into drafting.</div>
+      <div class="grid grid-4" id="templatesGrid"></div>
+    </section>
+
+    <!-- ============ CLAUSE LIBRARY ============ -->
+    <section class="view" id="view-clauses">
+      <div class="section-title">Clause Library</div>
+      <div class="section-sub">Reusable clauses available to attach to any document. Edit the standard wording or add your own.</div>
+      <div class="card card-pad" style="margin-bottom:18px;">
+        <div class="tag-input-row">
+          <input type="text" id="newClauseTitle" placeholder="New clause title, e.g. Data Protection">
+          <button class="btn btn-primary" id="btnAddClause">+ Add Clause</button>
+        </div>
+        <div class="clause-list" id="libraryClauseList"></div>
+      </div>
+    </section>
+
+    <!-- ============ SAVED DOCUMENTS ============ -->
+    <section class="view" id="view-saved">
+      <div class="section-title">Saved Documents</div>
+      <div class="section-sub">All drafts and finalized documents stored locally in this browser.</div>
+      <div class="filter-bar">
+        <select id="filterType"><option value="">All document types</option></select>
+        <select id="filterStatus">
+          <option value="">All statuses</option>
+          <option value="draft">Draft</option>
+          <option value="final">Final</option>
+        </select>
+        <input type="text" id="filterQuery" placeholder="Filter by title or party name…">
+      </div>
+      <div class="card"><div id="savedTableWrap"></div></div>
+    </section>
+
+    <!-- ============ RECENT ============ -->
+    <section class="view" id="view-recent">
+      <div class="section-title">Recent Documents</div>
+      <div class="section-sub">Your last 10 created or updated documents.</div>
+      <div class="card"><div id="recentTableWrap"></div></div>
+    </section>
+
+    <!-- ============ SEARCH ============ -->
+    <section class="view" id="view-search">
+      <div class="section-title">Search</div>
+      <div class="section-sub">Search across saved documents, clause library and templates.</div>
+      <div class="field" style="max-width:460px;"><input type="text" id="globalSearchInput" placeholder="Type to search…"></div>
+      <div id="searchResults"></div>
+    </section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section class="view" id="view-settings">
+      <div class="section-title">Settings</div>
+      <div class="section-sub">Firm details are used as the default letterhead reference across documents.</div>
+      <div class="card card-pad" style="max-width:560px;">
+        <div class="field"><label>Firm / Office name</label><input type="text" id="setFirmName" placeholder="e.g. P B & Associates"></div>
+        <div class="field"><label>Default place of execution</label><input type="text" id="setPlace" placeholder="e.g. Ahmedabad"></div>
+        <div class="field"><label>Default governing law</label><input type="text" id="setLaw" placeholder="e.g. Laws of India"></div>
+        <div class="field"><label>Default jurisdiction</label><input type="text" id="setJuris" placeholder="e.g. Courts at Ahmedabad"></div>
+        <button class="btn btn-primary" id="btnSaveSettings">Save Settings</button>
+      </div>
+      <div class="card card-pad" style="max-width:560px;margin-top:18px;">
+        <div class="section-title" style="font-size:14.5px;">Data Management</div>
+        <div class="section-sub" style="margin-bottom:14px;">All data is stored only in this browser's local storage.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn" id="btnExportAll">Export All Data (JSON)</button>
+          <button class="btn btn-danger" id="btnClearAll">Erase All Data</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div id="toastHost"></div>
+<div class="modal-overlay" id="modalOverlay" hidden>
+  <div class="modal-box">
+    <h3 id="modalTitle">Confirm</h3>
+    <p id="modalMsg"></p>
+    <div class="modal-actions">
+      <button class="btn" id="modalCancel">Cancel</button>
+      <button class="btn btn-danger" id="modalOk">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* =========================================================================
+   STORAGE KEYS
+========================================================================= */
+var K_DOCS = 'pbtool_documents_v1';
+var K_CLAUSES = 'pbtool_clauses_v1';
+var K_SETTINGS = 'pbtool_settings_v1';
+var K_COUNTER = 'pbtool_counter_v1';
+
+/* =========================================================================
+   UTILITIES
+========================================================================= */
+function uid(){ return 'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function esc(str){
+  if(str===undefined||str===null) return '';
+  return String(str).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function toToken(id){ return id.replace(/([A-Z])/g,'_$1').toUpperCase(); }
+function fillTemplate(str, ctx){
+  return str.replace(/{{\s*([A-Z0-9_]+)\s*}}/g, function(m,key){
+    var v = ctx[key];
+    return (v===undefined || v===null || v==='') ? ('[' + key.replace(/_/g,' ').toLowerCase() + ']') : v;
+  });
+}
+function formatDate(iso){
+  if(!iso) return '[date]';
+  var d = new Date(iso+'T00:00:00');
+  if(isNaN(d)) return iso;
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
+}
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function loadJSON(key, fallback){
+  try{ var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; }
+}
+function saveJSON(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){ toast('Storage error — could not save.','error'); } }
+
+function toast(msg, type){
+  var host = document.getElementById('toastHost');
+  var t = document.createElement('div');
+  t.className = 'toast'+(type?' '+type:'');
+  t.textContent = msg;
+  host.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(function(){ t.remove(); },300); }, 2600);
+}
+function confirmDialog(title, msg, onOk){
+  var overlay = document.getElementById('modalOverlay');
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMsg').textContent = msg;
+  overlay.hidden = false;
+  function cleanup(){ overlay.hidden = true; okBtn.removeEventListener('click', okHandler); cancelBtn.removeEventListener('click', cancelHandler); }
+  var okBtn = document.getElementById('modalOk');
+  var cancelBtn = document.getElementById('modalCancel');
+  function okHandler(){ cleanup(); onOk(); }
+  function cancelHandler(){ cleanup(); }
+  okBtn.addEventListener('click', okHandler);
+  cancelBtn.addEventListener('click', cancelHandler);
+}
+
+/* =========================================================================
+   DEFAULT CLAUSE LIBRARY
+========================================================================= */
+var FACTORY_CLAUSES = [
+  {id:'confidentiality', title:'Confidentiality', text:'Each Party shall keep confidential all non-public information disclosed by the other Party in connection with this document and shall not disclose such information to any third party without the prior written consent of the disclosing Party, except as required by law.'},
+  {id:'nonDisclosure', title:'Non-Disclosure', text:'The Receiving Party agrees to use the Confidential Information solely for the purpose for which it was disclosed and shall not use it for any purpose that is detrimental to the interests of the Disclosing Party.'},
+  {id:'indemnity', title:'Indemnity', text:'Each Party shall indemnify and keep indemnified the other Party against all losses, damages, costs and expenses arising out of any breach of the terms of this document or any negligent act or omission by the indemnifying Party.'},
+  {id:'termination', title:'Termination', text:'This document may be terminated by either Party by giving {{NOTICE_PERIOD}} days\' prior written notice to the other Party. Termination shall not affect any rights or obligations accrued prior to the date of termination.'},
+  {id:'forceMajeure', title:'Force Majeure', text:'Neither Party shall be liable for any failure or delay in performance due to causes beyond its reasonable control, including acts of God, natural disaster, war, riot, strike, or governmental action, provided that the affected Party promptly notifies the other Party of such event.'},
+  {id:'arbitration', title:'Arbitration', text:'Any dispute, controversy or claim arising out of or relating to this document shall be referred to and finally resolved by arbitration under the Arbitration and Conciliation Act, 1996 (and any statutory modification thereof), by a sole arbitrator mutually appointed by the Parties. The seat and venue of arbitration shall be {{JURISDICTION}}.'},
+  {id:'disputeResolution', title:'Dispute Resolution', text:'The Parties shall first attempt to resolve any dispute amicably through good-faith negotiation. If the dispute is not resolved within thirty (30) days, either Party may pursue the remedies available under this document, including arbitration where specified.'},
+  {id:'paymentTerms', title:'Payment Terms', text:'All payments due under this document shall be made in the manner and within the timelines specified herein. Any delay in payment beyond the due date may attract interest as mutually agreed between the Parties in writing.'},
+  {id:'renewal', title:'Renewal', text:'This document may be renewed for such further period and on such terms as may be mutually agreed between the Parties in writing, at least thirty (30) days prior to the expiry of the then-current term.'},
+  {id:'notice', title:'Notice', text:'Any notice required to be given under this document shall be in writing and shall be deemed duly served if delivered by hand, registered post, or electronic mail to the address of the Party set out in this document.'},
+  {id:'governingLaw', title:'Governing Law', text:'This document shall be governed by and construed in accordance with the {{GOVERNING_LAW}}.'},
+  {id:'jurisdiction', title:'Jurisdiction', text:'Subject to the arbitration/dispute-resolution provisions herein, the courts at {{JURISDICTION}} shall have exclusive jurisdiction over any matter arising out of or in connection with this document.'},
+  {id:'intellectualProperty', title:'Intellectual Property', text:'All intellectual property rights, including but not limited to copyrights, trademarks, patents and trade secrets, created or used in the course of this document shall remain vested in the Party that owned such rights prior to the date of this document, unless expressly assigned in writing.'},
+  {id:'liability', title:'Limitation of Liability', text:'Neither Party shall be liable to the other for any indirect, incidental or consequential loss or damage arising out of or in connection with this document, and the aggregate liability of either Party shall not exceed the total consideration paid or payable under this document.'}
+];
+
+/* =========================================================================
+   DOCUMENT TYPE DEFINITIONS
+   partiesMode: 'fixed2' | 'repeatable' | 'single'
+========================================================================= */
+var T = 'text', TA='textarea', N='number', D='date';
+
+var DOCUMENT_TYPES = [
+{
+  id:'partnership-deed', code:'PD', name:'Partnership Deed', group:'Business',
+  blurb:'Formation deed governing a general partnership firm.',
+  partiesMode:'repeatable', roleSingular:'Partner', minParties:2,
+  partyExtraFields:[
+    {id:'capitalContribution', label:'Capital Contribution (₹)', type:N, required:true},
+    {id:'profitShare', label:'Profit / Loss Share (%)', type:N, required:true}
+  ],
+  specificFields:[
+    {id:'firmName', label:'Name of Partnership Firm', type:T, required:true},
+    {id:'businessActivity', label:'Nature / Principal Place of Business', type:TA, required:true},
+    {id:'drawingsPolicy', label:'Drawings Policy', type:TA},
+    {id:'remuneration', label:'Partners\' Remuneration', type:TA},
+    {id:'interestOnCapital', label:'Interest on Capital', type:T, placeholder:'e.g. 12% per annum'},
+    {id:'bankingArrangements', label:'Banking Arrangements', type:TA},
+    {id:'admissionRetirement', label:'Admission, Retirement & Dissolution Terms', type:TA}
+  ],
+  recital(ctx){ return 'WHEREAS the Parties named above have agreed to associate themselves as partners in a partnership firm under the name and style of "'+ctx.FIRM_NAME+'" to carry on the business of '+ctx.BUSINESS_ACTIVITY+', on the terms and conditions recorded hereunder.'; },
+  clauses(ctx, doc){
+    var out = [];
+    out.push('The firm shall carry on the business of '+ctx.BUSINESS_ACTIVITY+' under the name and style of "'+ctx.FIRM_NAME+'".');
+    out.push('The capital of the firm shall be contributed by the Partners in the amounts set out in Schedule A, and profits and losses shall be shared in the ratio also set out in Schedule A.');
+    if(ctx.INTEREST_ON_CAPITAL) out.push('Interest on capital contributed by the Partners shall be payable at '+ctx.INTEREST_ON_CAPITAL+', subject to the provisions of applicable law.');
+    if(ctx.REMUNERATION) out.push('Remuneration to working Partners shall be paid as follows: '+ctx.REMUNERATION+'.');
+    if(ctx.DRAWINGS_POLICY) out.push('Partners may draw amounts from the firm in accordance with the following policy: '+ctx.DRAWINGS_POLICY+'.');
+    if(ctx.BANKING_ARRANGEMENTS) out.push('Banking arrangements of the firm shall be as follows: '+ctx.BANKING_ARRANGEMENTS+'.');
+    if(ctx.ADMISSION_RETIREMENT) out.push('Admission of a new partner, retirement of an existing Partner, and dissolution of the firm shall be governed as follows: '+ctx.ADMISSION_RETIREMENT+'.');
+    out.push('The books of account of the firm shall be maintained at its principal place of business and shall be open to inspection by any Partner at all reasonable times.');
+    out.push('No Partner shall, without the written consent of the other Partners, assign or transfer their share or interest in the firm to any third party.');
+    return out;
+  },
+  schedule(ctx, doc){
+    var rows = doc.parties.map(function(p){ return '<tr><td>'+esc(p.name||'—')+'</td><td>'+esc(p.capitalContribution||'0')+'</td><td>'+esc(p.profitShare||'0')+'%</td></tr>'; }).join('');
+    return {title:'Schedule A — Capital Contribution &amp; Profit Sharing', html:'<table class="table"><tr><th>Partner</th><th>Capital Contribution (₹)</th><th>Profit / Loss Share</th></tr>'+rows+'</table>'};
+  },
+  defaultClauseIds:['governingLaw','jurisdiction','disputeResolution','notice']
+},
+{
+  id:'llp-agreement', code:'LLP', name:'LLP Agreement', group:'Business',
+  blurb:'Governing agreement for a Limited Liability Partnership.',
+  partiesMode:'repeatable', roleSingular:'Partner', minParties:2,
+  partyExtraFields:[
+    {id:'capitalContribution', label:'Capital Contribution (₹)', type:N, required:true},
+    {id:'profitShare', label:'Profit Share (%)', type:N, required:true},
+    {id:'designatedPartner', label:'Designated Partner? (Yes/No)', type:T}
+  ],
+  specificFields:[
+    {id:'llpName', label:'Name of LLP', type:T, required:true},
+    {id:'llpin', label:'LLPIN (if allotted)', type:T},
+    {id:'businessActivity', label:'Nature of Business', type:TA, required:true},
+    {id:'meetingsFrequency', label:'Frequency of Partner Meetings', type:T, placeholder:'e.g. Quarterly'},
+    {id:'capitalAccountRules', label:'Capital Account &amp; Drawings Rules', type:TA}
+  ],
+  recital(ctx){ return 'WHEREAS the Parties are the Partners of "'+ctx.LLP_NAME+'" LLP'+(ctx.LLPIN?' (LLPIN: '+ctx.LLPIN+')':'')+', incorporated to carry on the business of '+ctx.BUSINESS_ACTIVITY+', and wish to record the mutual rights and duties of the Partners inter se and vis-à-vis the LLP.'; },
+  clauses(ctx){
+    var out=[];
+    out.push('The name of the Limited Liability Partnership shall be "'+ctx.LLP_NAME+'" and it shall carry on the business of '+ctx.BUSINESS_ACTIVITY+'.');
+    out.push('Contribution of each Partner and their respective profit-sharing ratio shall be as set out in Schedule A.');
+    if(ctx.MEETINGS_FREQUENCY) out.push('Meetings of the Partners shall be held '+ctx.MEETINGS_FREQUENCY.toLowerCase()+' to review the affairs of the LLP.');
+    if(ctx.CAPITAL_ACCOUNT_RULES) out.push('Capital accounts and drawings of the Partners shall be governed as follows: '+ctx.CAPITAL_ACCOUNT_RULES+'.');
+    out.push('Designated Partners identified in Schedule A shall be responsible for compliance with the Limited Liability Partnership Act, 2008 and rules made thereunder.');
+    out.push('No Partner shall bind the LLP in any matter outside the ordinary course of business without the prior consent of all Partners.');
+    return out;
+  },
+  schedule(ctx, doc){
+    var rows = doc.parties.map(function(p){ return '<tr><td>'+esc(p.name||'—')+'</td><td>'+esc(p.capitalContribution||'0')+'</td><td>'+esc(p.profitShare||'0')+'%</td><td>'+esc(p.designatedPartner||'No')+'</td></tr>'; }).join('');
+    return {title:'Schedule A — Contribution, Profit Share &amp; Designated Partners', html:'<table class="table"><tr><th>Partner</th><th>Contribution (₹)</th><th>Profit Share</th><th>Designated Partner</th></tr>'+rows+'</table>'};
+  },
+  defaultClauseIds:['governingLaw','jurisdiction','disputeResolution','notice','indemnity']
+},
+{
+  id:'rent-lease', code:'RLA', name:'Rent / Lease Agreement', group:'Property',
+  blurb:'Lease of residential or commercial premises.',
+  partiesMode:'fixed2', roles:['Landlord','Tenant'],
+  specificFields:[
+    {id:'propertyAddress', label:'Full Address of Leased Premises', type:TA, required:true},
+    {id:'propertyDescription', label:'Description of Premises', type:TA, placeholder:'e.g. 2BHK flat, 950 sq.ft., 2nd floor'},
+    {id:'monthlyRent', label:'Monthly Rent (₹)', type:N, required:true},
+    {id:'securityDeposit', label:'Security Deposit (₹)', type:N, required:true},
+    {id:'leaseTerm', label:'Lease Term (months)', type:N, required:true},
+    {id:'maintenanceResponsibility', label:'Maintenance Responsibility', type:TA},
+    {id:'useOfPremises', label:'Permitted Use of Premises', type:T, placeholder:'e.g. Residential purposes only'}
+  ],
+  recital(ctx){ return 'WHEREAS the Landlord is the lawful owner of the premises situated at '+ctx.PROPERTY_ADDRESS+' ("Premises") and has agreed to let out the same to the Tenant, and the Tenant has agreed to take the Premises on lease, on the terms recorded hereunder.'; },
+  clauses(ctx){
+    var out=[];
+    out.push('The Landlord hereby lets out and the Tenant hereby takes on rent the Premises described as: '+ctx.PROPERTY_DESCRIPTION+', situated at '+ctx.PROPERTY_ADDRESS+'.');
+    out.push('The monthly rent for the Premises shall be ₹'+ctx.MONTHLY_RENT+', payable in advance on or before the 5th day of each calendar month.');
+    out.push('The Tenant has paid to the Landlord a refundable interest-free security deposit of ₹'+ctx.SECURITY_DEPOSIT+', refundable at the end of the tenancy after adjusting any dues.');
+    out.push('This lease shall be for a term of '+ctx.LEASE_TERM+' months commencing from {{EFFECTIVE_DATE}}, renewable thereafter on mutually agreed terms.');
+    if(ctx.USE_OF_PREMISES) out.push('The Tenant shall use the Premises only for '+ctx.USE_OF_PREMISES+' and shall not use it for any illegal or unauthorized purpose.');
+    if(ctx.MAINTENANCE_RESPONSIBILITY) out.push('Maintenance of the Premises shall be the responsibility as follows: '+ctx.MAINTENANCE_RESPONSIBILITY+'.');
+    out.push('The Tenant shall not sub-let, assign or part with possession of the Premises, in whole or in part, without the prior written consent of the Landlord.');
+    out.push('The Tenant shall hand over vacant, peaceful possession of the Premises to the Landlord upon expiry or earlier termination of this lease, in the same condition as received, ordinary wear and tear excepted.');
+    return out;
+  },
+  defaultClauseIds:['termination','notice','governingLaw','jurisdiction']
+},
+{
+  id:'employment-agreement', code:'EMP', name:'Employment Agreement', group:'HR',
+  blurb:'Terms of employment between an employer and employee.',
+  partiesMode:'fixed2', roles:['Employer','Employee'],
+  specificFields:[
+    {id:'designation', label:'Designation / Job Title', type:T, required:true},
+    {id:'department', label:'Department', type:T},
+    {id:'salary', label:'Annual Gross Salary (₹)', type:N, required:true},
+    {id:'workLocation', label:'Primary Work Location', type:T, required:true},
+    {id:'workingHours', label:'Working Hours', type:T, placeholder:'e.g. 9:30 AM – 6:30 PM, Mon–Fri'},
+    {id:'probationPeriod', label:'Probation Period (months)', type:N},
+    {id:'noticePeriodEmp', label:'Notice Period (days)', type:N, required:true},
+    {id:'benefits', label:'Benefits / Perquisites', type:TA}
+  ],
+  recital(ctx){ return 'WHEREAS the Employer wishes to employ the Employee, and the Employee has agreed to serve the Employer, in the capacity and on the terms recorded hereunder.'; },
+  clauses(ctx){
+    var out=[];
+    out.push('The Employee is appointed to the position of '+ctx.DESIGNATION+(ctx.DEPARTMENT?(' in the '+ctx.DEPARTMENT+' department'):'')+', with effect from {{EFFECTIVE_DATE}}.');
+    out.push('The Employee shall be based at '+ctx.WORK_LOCATION+' and shall perform such duties as may reasonably be assigned by the Employer from time to time.');
+    out.push('The Employee shall be paid an annual gross salary of ₹'+ctx.SALARY+', payable in accordance with the Employer\'s standard payroll cycle, subject to applicable statutory deductions.');
+    if(ctx.WORKING_HOURS) out.push('The standard working hours shall be '+ctx.WORKING_HOURS+', subject to the Employer\'s policies in force from time to time.');
+    if(ctx.PROBATION_PERIOD) out.push('The Employee shall be on probation for a period of '+ctx.PROBATION_PERIOD+' months from the date of joining, during which either Party may terminate this agreement with 7 days\' written notice.');
+    out.push('After confirmation, this agreement may be terminated by either Party by giving '+ctx.NOTICE_PERIOD_EMP+' days\' prior written notice, or salary in lieu thereof.');
+    if(ctx.BENEFITS) out.push('The Employee shall be entitled to the following benefits: '+ctx.BENEFITS+'.');
+    out.push('The Employee shall devote full working time to the Employer\'s business and shall not, during the term of employment, engage in any other employment or business without the Employer\'s prior written consent.');
+    return out;
+  },
+  defaultClauseIds:['confidentiality','intellectualProperty','termination','governingLaw','jurisdiction']
+},
+{
+  id:'nda', code:'NDA', name:'Non-Disclosure Agreement (NDA)', group:'Commercial',
+  blurb:'Protects confidential information shared between parties.',
+  partiesMode:'fixed2', roles:['Disclosing Party','Receiving Party'],
+  specificFields:[
+    {id:'purposeOfDisclosure', label:'Purpose of Disclosure', type:TA, required:true},
+    {id:'confidentialInfoDescription', label:'Description of Confidential Information', type:TA, required:true},
+    {id:'disclosureDuration', label:'Confidentiality Period (years)', type:N, required:true},
+    {id:'exclusions', label:'Exclusions from Confidential Information', type:TA}
+  ],
+  recital(ctx){ return 'WHEREAS the Disclosing Party possesses certain confidential and proprietary information, and wishes to disclose such information to the Receiving Party solely for the purpose of '+ctx.PURPOSE_OF_DISCLOSURE+', and the Receiving Party agrees to receive and protect such information on the terms recorded hereunder.'; },
+  clauses(ctx){
+    var out=[];
+    out.push('"Confidential Information" means '+ctx.CONFIDENTIAL_INFO_DESCRIPTION+' disclosed by the Disclosing Party to the Receiving Party, whether in oral, written, electronic or any other form.');
+    out.push('The Receiving Party shall use the Confidential Information solely for the purpose of '+ctx.PURPOSE_OF_DISCLOSURE+' and for no other purpose whatsoever.');
+    if(ctx.EXCLUSIONS) out.push('Confidential Information shall not include information that: '+ctx.EXCLUSIONS+'.');
+    out.push('The obligations of confidentiality under this agreement shall survive for a period of '+ctx.DISCLOSURE_DURATION+' years from the date of disclosure.');
+    out.push('The Receiving Party shall promptly notify the Disclosing Party of any unauthorized use or disclosure of the Confidential Information that comes to its attention.');
+    out.push('All Confidential Information, and any copies thereof, shall be returned or destroyed by the Receiving Party upon the Disclosing Party\'s written request.');
+    return out;
+  },
+  defaultClauseIds:['confidentiality','nonDisclosure','intellectualProperty','governingLaw','jurisdiction']
+},
+{
+  id:'service-agreement', code:'SVC', name:'Service Agreement', group:'Commercial',
+  blurb:'Provision of defined services for a fee.',
+  partiesMode:'fixed2', roles:['Service Provider','Client'],
+  specificFields:[
+    {id:'scopeOfServices', label:'Scope of Services', type:TA, required:true},
+    {id:'serviceFee', label:'Service Fee (₹)', type:N, required:true},
+    {id:'deliverySchedule', label:'Delivery / Timeline Schedule', type:TA},
+    {id:'deliverables', label:'Key Deliverables', type:TA, required:true}
+  ],
+  recital(ctx){ return 'WHEREAS the Client wishes to engage the Service Provider to provide the services described herein, and the Service Provider has agreed to render such services, on the terms recorded hereunder.'; },
+  clauses(ctx){
+    var out=[];
+    out.push('The Service Provider shall provide the following services to the Client: '+ctx.SCOPE_OF_SERVICES+'.');
+    out.push('The key deliverables under this agreement shall be: '+ctx.DELIVERABLES+'.');
+    if(ctx.DELIVERY_SCHEDULE) out.push('The services shall be delivered in accordance with the following schedule: '+ctx.DELIVERY_SCHEDULE+'.');
+    out.push('In consideration of the services rendered, the Client shall pay the Service Provider a fee of ₹'+ctx.SERVICE_FEE+', in the manner set out in the Payment Terms of this agreement.');
+    out.push('The Service Provider shall perform the services with reasonable skill, care and diligence, in accordance with applicable industry standards.');
+    out.push('The Service Provider shall act as an independent contractor and nothing in this agreement shall be construed as creating a relationship of employer-employee, partnership or joint venture.');
+    return out;
+  },
+  defaultClauseIds:['paymentTerms','confidentiality','intellectualProperty','termination','liability','governingLaw']
+},
+{
+  id:'sale-purchase', code:'SPA', name:'Sale / Purchase Agreement', group:'Commercial',
+  blurb:'Sale and transfer of goods, property or assets.',
+  partiesMode:'fixed2', roles:['Seller','Buyer'],
+  specificFields:[
+    {id:'itemDescription', label:'Description of Goods / Asset / Property', type:TA, required:true},
+    {id:'saleAmount', label:'Sale Consideration (₹)', type:N, required:true},
+    {id:'deliveryDate', label:'Delivery / Handover Date', type:D, required:true},
+    {id:'warranties', label:'Warranties Given by Seller', type:TA},
+    {id:'titleTransfer', label:'Mode / Timing of Title Transfer', type:TA}
+  ],
+  recital(ctx){ return 'WHEREAS the Seller is the sole and lawful owner of the item(s) described herein and has agreed to sell the same to the Buyer, and the Buyer has agreed to purchase the same, free from all encumbrances, on the terms recorded hereunder.'; },
+  clauses(ctx){
+    var out=[];
+    out.push('The Seller hereby agrees to sell and the Buyer hereby agrees to purchase the following: '+ctx.ITEM_DESCRIPTION+' ("the Property/Goods").');
+    out.push('The total sale consideration for the Property/Goods shall be ₹'+ctx.SALE_AMOUNT+', payable in the manner set out in the Payment Terms of this agreement.');
+    out.push('The Seller shall deliver / hand over possession of the Property/Goods to the Buyer on or before '+formatDate(ctx.__deliveryDateRaw)+'.');
+    if(ctx.TITLE_TRANSFER) out.push('Title in the Property/Goods shall pass to the Buyer as follows: '+ctx.TITLE_TRANSFER+'.');
+    if(ctx.WARRANTIES) out.push('The Seller warrants and represents as follows: '+ctx.WARRANTIES+'.');
+    out.push('The Seller confirms that the Property/Goods are free from any lien, charge, encumbrance or third-party claim, and the Seller has full right and authority to sell the same.');
+    return out;
+  },
+  defaultClauseIds:['paymentTerms','indemnity','liability','governingLaw','jurisdiction']
+},
+{
+  id:'mou', code:'MOU', name:'Memorandum of Understanding (MOU)', group:'Commercial',
+  blurb:'Non-binding or semi-binding record of intended collaboration.',
+  partiesMode:'repeatable', roleSingular:'Party', minParties:2,
+  specificFields:[
+    {id:'purposeOfMou', label:'Purpose / Objective of MOU', type:TA, required:true},
+    {id:'collaborationAreas', label:'Areas of Collaboration', type:TA, required:true},
+    {id:'contributionOfParties', label:'Contribution of Each Party', type:TA},
+    {id:'validityPeriod', label:'Validity Period (months)', type:N, required:true}
+  ],
+  recital(ctx){ return 'WHEREAS the Parties wish to record their mutual understanding for the purpose of '+ctx.PURPOSE_OF_MOU+', and have agreed to collaborate on the terms set out hereunder, on a good-faith, non-exclusive basis.'; },
+  clauses(ctx){
+    var out=[];
+    out.push('The purpose of this Memorandum of Understanding is '+ctx.PURPOSE_OF_MOU+'.');
+    out.push('The Parties agree to collaborate in the following areas: '+ctx.COLLABORATION_AREAS+'.');
+    if(ctx.CONTRIBUTION_OF_PARTIES) out.push('The respective contributions of the Parties shall be as follows: '+ctx.CONTRIBUTION_OF_PARTIES+'.');
+    out.push('This MOU shall remain valid for a period of '+ctx.VALIDITY_PERIOD+' months from {{EFFECTIVE_DATE}}, unless extended or terminated earlier by mutual written consent.');
+    out.push('This MOU records the Parties\' present intentions and, save for the confidentiality and governing-law provisions, does not create legally binding obligations unless the Parties execute a definitive agreement.');
+    return out;
+  },
+  defaultClauseIds:['confidentiality','notice','governingLaw']
+},
+{
+  id:'moa', code:'MOA', name:'Memorandum of Association (MOA)', group:'Corporate',
+  blurb:'Charter document defining a company\'s objects and scope.',
+  partiesMode:'repeatable', roleSingular:'Subscriber', minParties:1,
+  partyExtraFields:[{id:'sharesSubscribed', label:'Number of Shares Subscribed', type:N, required:true}],
+  specificFields:[
+    {id:'companyName', label:'Proposed Name of Company', type:T, required:true},
+    {id:'registeredOffice', label:'State of Registered Office', type:T, required:true},
+    {id:'mainObjects', label:'Main Objects of the Company', type:TA, required:true},
+    {id:'authorizedCapital', label:'Authorized Share Capital (₹)', type:N, required:true},
+    {id:'liabilityClause', label:'Liability of Members', type:T, placeholder:'e.g. Limited by shares'}
+  ],
+  recital(ctx){ return 'WHEREAS the Subscribers hereto are desirous of forming a company under the applicable Companies Act, and have agreed to subscribe for the shares set out against their respective names for the objects set out hereunder.'; },
+  clauses(ctx){
+    var out=[];
+    out.push('The name of the Company shall be "'+ctx.COMPANY_NAME+'".');
+    out.push('The Registered Office of the Company shall be situated in the State of '+ctx.REGISTERED_OFFICE+'.');
+    out.push('The main objects of the Company to be pursued on its incorporation are: '+ctx.MAIN_OBJECTS+'.');
+    out.push('The Liability of the Members of the Company is '+(ctx.LIABILITY_CLAUSE||'Limited')+'.');
+    out.push('The Authorized Share Capital of the Company shall be ₹'+ctx.AUTHORIZED_CAPITAL+', divided into equity shares of such value as the Board may determine.');
+    out.push('The Subscribers to this Memorandum have agreed to take the number of shares set opposite their respective names in Schedule A, and are desirous of being formed into a Company in pursuance of this Memorandum.');
+    return out;
+  },
+  schedule(ctx, doc){
+    var rows = doc.parties.map(function(p){ return '<tr><td>'+esc(p.name||'—')+'</td><td>'+esc(p.address||'—')+'</td><td>'+esc(p.sharesSubscribed||'0')+'</td></tr>'; }).join('');
+    return {title:'Schedule A — Subscribers to the Memorandum', html:'<table class="table"><tr><th>Subscriber</th><th>Address</th><th>Shares Subscribed</th></tr>'+rows+'</table>'};
+  },
+  hasClauseLibrary:false,
+  defaultClauseIds:['governingLaw']
+},
+{
+  id:'aoa', code:'AOA', name:'Articles of Association (AOA)', group:'Corporate',
+  blurb:'Internal rules governing company management and shareholder rights.',
+  partiesMode:'repeatable', roleSingular:'Director', minParties:1,
+  specificFields:[
+    {id:'companyName', label:'Name of Company', type:T, required:true},
+    {id:'shareCapitalStructure', label:'Share Capital Structure', type:TA, required:true},
+    {id:'boardComposition', label:'Composition of the Board of Directors', type:TA, required:true},
+    {id:'meetingProcedures', label:'Board / General Meeting Procedures', type:TA},
+    {id:'votingRights', label:'Voting Rights of Members', type:TA}
+  ],
+  recital(ctx){ return 'WHEREAS these Articles of Association shall constitute the regulations for the management of "'+ctx.COMPANY_NAME+'" ("the Company"), and shall govern the rights and obligations of its Members and Directors as recorded hereunder.'; },
+  clauses(ctx){
+    var out=[];
+    out.push('The share capital of the Company shall be structured as follows: '+ctx.SHARE_CAPITAL_STRUCTURE+'.');
+    out.push('The Board of Directors of the Company shall be composed as follows: '+ctx.BOARD_COMPOSITION+'.');
+    if(ctx.MEETING_PROCEDURES) out.push('Meetings of the Board and general meetings of Members shall be convened and conducted as follows: '+ctx.MEETING_PROCEDURES+'.');
+    if(ctx.VOTING_RIGHTS) out.push('Voting rights of the Members of the Company shall be as follows: '+ctx.VOTING_RIGHTS+'.');
+    out.push('Subject to the provisions of the applicable Companies Act, the Directors may exercise all such powers of the Company as are not required to be exercised by the Company in general meeting.');
+    out.push('These Articles may be altered by a special resolution of the Members in accordance with the applicable Companies Act.');
+    return out;
+  },
+  hasClauseLibrary:false,
+  defaultClauseIds:['governingLaw']
+},
+{
+  id:'affidavit', code:'AFF', name:'Affidavit', group:'Personal / Legal',
+  blurb:'Sworn written statement of facts.',
+  partiesMode:'single', roles:['Deponent'],
+  specificFields:[
+    {id:'deponentAge', label:'Age of Deponent', type:N, required:true},
+    {id:'statementOfFacts', label:'Statement of Facts (numbered points will be generated)', type:TA, required:true},
+    {id:'purposeOfAffidavit', label:'Purpose of Affidavit', type:T, required:true}
+  ],
+  recital(ctx){ return 'I, '+ctx.PARTY_1_NAME+', son/daughter/wife of ______, aged about '+ctx.DEPONENT_AGE+' years, residing at '+ctx.PARTY_1_ADDRESS+', do hereby solemnly affirm and declare as under:'; },
+  clauses(ctx){
+    var facts = String(ctx.STATEMENT_OF_FACTS||'').split(/\n+/).filter(function(x){return x.trim();});
+    var out = facts.length ? facts : ['[Statement of facts to be inserted]'];
+    out.push('That this Affidavit is being sworn for the purpose of '+ctx.PURPOSE_OF_AFFIDAVIT+'.');
+    out.push('That the contents of the above Affidavit are true and correct to the best of my knowledge, information and belief, and nothing material has been concealed therefrom.');
+    return out;
+  },
+  hasClauseLibrary:false,
+  isAffidavitStyle:true,
+  defaultClauseIds:[]
+},
+{
+  id:'declaration', code:'DEC', name:'Declaration', group:'Personal / Legal',
+  blurb:'Formal written declaration of facts or intent.',
+  partiesMode:'single', roles:['Declarant'],
+  specificFields:[
+    {id:'declarationStatement', label:'Declaration Statement (numbered points will be generated)', type:TA, required:true},
+    {id:'purposeOfDeclaration', label:'Purpose of Declaration', type:T, required:true}
+  ],
+  recital(ctx){ return 'I, '+ctx.PARTY_1_NAME+', residing at '+ctx.PARTY_1_ADDRESS+', do hereby solemnly declare as follows:'; },
+  clauses(ctx){
+    var facts = String(ctx.DECLARATION_STATEMENT||'').split(/\n+/).filter(function(x){return x.trim();});
+    var out = facts.length ? facts : ['[Declaration content to be inserted]'];
+    out.push('That this declaration is made for the purpose of '+ctx.PURPOSE_OF_DECLARATION+' and I undertake to be bound by the statements made herein.');
+    out.push('That I declare the above to be true and correct to the best of my knowledge and belief.');
+    return out;
+  },
+  hasClauseLibrary:false,
+  isAffidavitStyle:true,
+  defaultClauseIds:[]
+},
+{
+  id:'authority-letter', code:'AUTH', name:'Authority Letter', group:'Personal / Legal',
+  blurb:'Grants specific authority from one person/entity to another.',
+  partiesMode:'fixed2', roles:['Grantor','Grantee / Authorized Person'],
+  specificFields:[
+    {id:'scopeOfAuthority', label:'Scope of Authority Granted', type:TA, required:true},
+    {id:'validityPeriodAuth', label:'Validity Period', type:T, placeholder:'e.g. Until 31 March 2027 / Until revoked'}
+  ],
+  recital(ctx){ return 'I / We, '+ctx.PARTY_1_NAME+', of '+ctx.PARTY_1_ADDRESS+', do hereby authorize '+ctx.PARTY_2_NAME+', of '+ctx.PARTY_2_ADDRESS+', to act on my/our behalf as set out hereunder.'; },
+  clauses(ctx){
+    var out=[];
+    out.push(ctx.PARTY_2_NAME+' is hereby authorized to: '+ctx.SCOPE_OF_AUTHORITY+'.');
+    out.push('This authority shall remain valid '+ (ctx.VALIDITY_PERIOD_AUTH||'until revoked by the Grantor in writing') +'.');
+    out.push('All acts lawfully done by the Grantee within the scope of this authority shall be binding on the Grantor as if done by the Grantor personally.');
+    out.push('This authority may be revoked by the Grantor at any time by written notice to the Grantee, without assigning any reason.');
+    return out;
+  },
+  hasClauseLibrary:false,
+  defaultClauseIds:[]
+},
+{
+  id:'consultancy-agreement', code:'CONS', name:'Consultancy Agreement', group:'Commercial',
+  blurb:'Engagement of an independent consultant for professional services.',
+  partiesMode:'fixed2', roles:['Client','Consultant'],
+  specificFields:[
+    {id:'scopeOfConsultancy', label:'Scope of Consultancy Services', type:TA, required:true},
+    {id:'consultancyFee', label:'Consultancy Fee (₹)', type:N, required:true},
+    {id:'paymentSchedule', label:'Payment Schedule', type:TA},
+    {id:'expensesReimbursement', label:'Expense Reimbursement Policy', type:TA}
+  ],
+  recital(ctx){ return 'WHEREAS the Client wishes to engage the Consultant to provide independent professional consultancy services as described herein, and the Consultant has agreed to provide such services, on the terms recorded hereunder.'; },
+  clauses(ctx){
+    var out=[];
+    out.push('The Consultant shall provide the following consultancy services to the Client: '+ctx.SCOPE_OF_CONSULTANCY+'.');
+    out.push('In consideration of the services rendered, the Client shall pay the Consultant a fee of ₹'+ctx.CONSULTANCY_FEE+'.');
+    if(ctx.PAYMENT_SCHEDULE) out.push('Such fee shall be paid in accordance with the following schedule: '+ctx.PAYMENT_SCHEDULE+'.');
+    if(ctx.EXPENSES_REIMBURSEMENT) out.push('Reasonable expenses incurred by the Consultant shall be reimbursed as follows: '+ctx.EXPENSES_REIMBURSEMENT+'.');
+    out.push('The Consultant shall act in an independent capacity and shall not be deemed an employee, agent or partner of the Client for any purpose whatsoever, including tax and labour law purposes.');
+    out.push('The Consultant shall maintain confidentiality of all information received in the course of the consultancy and shall not use the same for any purpose other than performing the services.');
+    return out;
+  },
+  defaultClauseIds:['paymentTerms','confidentiality','intellectualProperty','termination','liability','governingLaw']
+},
+{
+  id:'loan-agreement', code:'LOAN', name:'Loan Agreement', group:'Finance',
+  blurb:'Terms of a loan between a lender and borrower.',
+  partiesMode:'fixed2', roles:['Lender','Borrower'],
+  specificFields:[
+    {id:'loanAmount', label:'Principal Loan Amount (₹)', type:N, required:true},
+    {id:'interestRate', label:'Rate of Interest (% p.a.)', type:T, required:true},
+    {id:'repaymentSchedule', label:'Repayment Schedule', type:TA, required:true},
+    {id:'securityCollateral', label:'Security / Collateral (if any)', type:TA}
+  ],
+  recital(ctx){ return 'WHEREAS the Borrower has approached the Lender for a loan of ₹'+ctx.LOAN_AMOUNT+' for the Borrower\'s own purposes, and the Lender has agreed to advance the said loan, on the terms recorded hereunder.'; },
+  clauses(ctx){
+    var out=[];
+    out.push('The Lender shall advance to the Borrower a principal sum of ₹'+ctx.LOAN_AMOUNT+' ("the Loan") on or about {{EFFECTIVE_DATE}}.');
+    out.push('The Loan shall carry interest at the rate of '+ctx.INTEREST_RATE+'% per annum, computed on the outstanding principal balance from time to time.');
+    out.push('The Borrower shall repay the Loan together with accrued interest in accordance with the following schedule: '+ctx.REPAYMENT_SCHEDULE+'.');
+    if(ctx.SECURITY_COLLATERAL) out.push('The Loan shall be secured by the following security/collateral: '+ctx.SECURITY_COLLATERAL+'.');
+    out.push('In the event of default in repayment of any installment, the entire outstanding amount together with interest shall, at the option of the Lender, become immediately due and payable.');
+    out.push('The Borrower may prepay the Loan, in whole or in part, at any time without penalty, unless otherwise agreed in writing.');
+    return out;
+  },
+  defaultClauseIds:['indemnity','liability','notice','governingLaw','jurisdiction']
+},
+{
+  id:'custom-agreement', code:'OTH', name:'Other Custom Agreement', group:'General',
+  blurb:'Flexible agreement template for any other arrangement.',
+  partiesMode:'repeatable', roleSingular:'Party', minParties:2,
+  specificFields:[
+    {id:'customPurpose', label:'Purpose of this Agreement', type:TA, required:true},
+    {id:'customTerms', label:'Key Terms (one per line — will be numbered)', type:TA, required:true}
+  ],
+  recital(ctx){ return 'WHEREAS the Parties wish to enter into this Agreement for the purpose of '+ctx.CUSTOM_PURPOSE+', and have agreed to the terms recorded hereunder.'; },
+  clauses(ctx){
+    var lines = String(ctx.CUSTOM_TERMS||'').split(/\n+/).filter(function(x){return x.trim();});
+    return lines.length ? lines : ['[Key terms to be inserted]'];
+  },
+  defaultClauseIds:['confidentiality','termination','notice','governingLaw','jurisdiction','disputeResolution']
+}
+];
+
+var TYPE_MAP = {};
+DOCUMENT_TYPES.forEach(function(t){ TYPE_MAP[t.id] = t; });
+
+/* =========================================================================
+   GOVERNING LAW MAP — auto-populated based on document type (Indian entities)
+   Sources: Indian Partnership Act 1932, LLP Act 2008, Companies Act 2013,
+   Indian Contract Act 1872, Transfer of Property Act 1882, Sale of Goods Act 1930,
+   Registration Act 1908, FEMA 1999, Industrial Employment Act 1946, etc.
+========================================================================= */
+var GOVERNING_LAW_MAP = {
+  'partnership-deed'     : 'Laws of India, in particular the Indian Partnership Act, 1932, as amended from time to time',
+  'llp-agreement'        : 'Laws of India, in particular the Limited Liability Partnership Act, 2008, and the rules made thereunder, as amended from time to time',
+  'rent-lease'           : 'Laws of India, in particular the Transfer of Property Act, 1882, the Registration Act, 1908, and applicable State Rent Control legislation, as amended from time to time',
+  'employment-agreement' : 'Laws of India, in particular the Indian Contract Act, 1872, the Industrial Employment (Standing Orders) Act, 1946, and other applicable labour legislation, as amended from time to time',
+  'nda'                  : 'Laws of India, in particular the Indian Contract Act, 1872, as amended from time to time',
+  'service-agreement'    : 'Laws of India, in particular the Indian Contract Act, 1872, as amended from time to time',
+  'sale-purchase'        : 'Laws of India, in particular the Sale of Goods Act, 1930, the Indian Contract Act, 1872, and the Transfer of Property Act, 1882 (where applicable), as amended from time to time',
+  'mou'                  : 'Laws of India, in particular the Indian Contract Act, 1872, as amended from time to time',
+  'moa'                  : 'Laws of India, in particular the Companies Act, 2013, and the rules made thereunder, as amended from time to time',
+  'aoa'                  : 'Laws of India, in particular the Companies Act, 2013, and the rules made thereunder, as amended from time to time',
+  'affidavit'            : 'Laws of India, in particular the Code of Civil Procedure, 1908, and the Indian Evidence Act, 1872, as amended from time to time',
+  'declaration'          : 'Laws of India, in particular the Indian Evidence Act, 1872, as amended from time to time',
+  'authority-letter'     : 'Laws of India, in particular the Indian Contract Act, 1872, and the Powers of Attorney Act, 1882, as amended from time to time',
+  'consultancy-agreement': 'Laws of India, in particular the Indian Contract Act, 1872, as amended from time to time',
+  'loan-agreement'       : 'Laws of India, in particular the Indian Contract Act, 1872, and applicable RBI regulations under FEMA, 1999 (where applicable), as amended from time to time',
+  'custom-agreement'     : 'Laws of India, as amended from time to time'
+};
+
+/* =========================================================================
+   COMMON FIELD DEFINITIONS (Information step)
+========================================================================= */
+function commonFields(type){
+  var f = [
+    {id:'docTitle', label:'Document Title', type:T, required:true, placeholder:type.name},
+    {id:'place', label:'Place of Execution', type:T, required:true},
+    {id:'date', label:'Date of Execution', type:D, required:true},
+    {id:'effectiveDate', label:'Effective Date', type:D, required:true}
+  ];
+  if(type.partiesMode !== 'single'){
+    f.push({id:'duration', label:'Duration / Term', type:T, placeholder:'e.g. 11 months, 3 years, Ongoing'});
+    f.push({id:'amount', label:'Amount / Consideration (₹, if applicable)', type:N});
+    f.push({id:'paymentTerms', label:'Payment Terms', type:TA, placeholder:'e.g. Within 7 days of invoice, via bank transfer'});
+    f.push({id:'terminationConditions', label:'Termination Conditions', type:TA});
+    f.push({id:'noticePeriod', label:'Notice Period (days)', type:N, placeholder:'e.g. 30'});
+  }
+  if(type.hasClauseLibrary !== false){
+    f.push({id:'governingLaw', label:'Governing Law', type:T, required:true, placeholder:'e.g. Laws of India'});
+    f.push({id:'jurisdiction', label:'Jurisdiction', type:T, required:true, placeholder:'e.g. Courts at Ahmedabad'});
+    f.push({id:'disputeResolutionMech', label:'Dispute Resolution Mechanism', type:T, placeholder:'e.g. Arbitration under Arbitration Act, 1996'});
+  }
+  f.push({id:'additionalTerms', label:'Additional Terms (optional — becomes an Annexure)', type:TA});
+  return f;
+}
+
+/* =========================================================================
+   APP STATE
+========================================================================= */
+var state = {
+  view: 'dashboard',
+  wizard: null
+};
+
+function freshWizard(typeId){
+  var type = TYPE_MAP[typeId];
+  var parties = [];
+  if(type.partiesMode === 'fixed2'){
+    parties = [ {role:type.roles[0], name:'',address:'',contact:'',idNumber:''}, {role:type.roles[1], name:'',address:'',contact:'',idNumber:''} ];
+  } else if(type.partiesMode === 'single'){
+    parties = [ {role:type.roles[0], name:'',address:'',contact:'',idNumber:''} ];
+  } else {
+    var n = type.minParties || 2;
+    for(var i=0;i<n;i++) parties.push({role:type.roleSingular+' '+(i+1), name:'',address:'',contact:'',idNumber:''});
+  }
+  var defClauses = (type.defaultClauseIds||[]).map(function(cid){
+    var lib = getClauseLibrary();
+    var found = lib.find(function(c){return c.id===cid;});
+    return found ? {id:found.id, title:found.title, text:found.text} : null;
+  }).filter(Boolean);
+  // Auto-populate governing law from map; fall back to settings value, then generic
+  var settings = loadJSON(K_SETTINGS, {});
+  var autoLaw = GOVERNING_LAW_MAP[typeId] || settings.law || 'Laws of India';
+  return {
+    docId: null,
+    step: 1,
+    typeId: typeId,
+    fields: { governingLaw: autoLaw },
+    parties: parties,
+    selectedClauses: defClauses,
+    status: 'draft'
+  };
+}
+
+/* =========================================================================
+   CLAUSE LIBRARY (persisted, editable)
+========================================================================= */
+function getClauseLibrary(){
+  var lib = loadJSON(K_CLAUSES, null);
+  if(!lib){ lib = FACTORY_CLAUSES.slice(); saveJSON(K_CLAUSES, lib); }
+  return lib;
+}
+function setClauseLibrary(lib){ saveJSON(K_CLAUSES, lib); }
+
+/* =========================================================================
+   DOCUMENT STORAGE
+========================================================================= */
+function getDocuments(){ return loadJSON(K_DOCS, []); }
+function setDocuments(docs){ saveJSON(K_DOCS, docs); }
+function nextDocNumber(typeCode){
+  var counters = loadJSON(K_COUNTER, {});
+  var year = new Date().getFullYear();
+  var key = typeCode+'-'+year;
+  counters[key] = (counters[key]||0)+1;
+  saveJSON(K_COUNTER, counters);
+  return 'PBT/'+typeCode+'/'+year+'/'+String(counters[key]).padStart(4,'0');
+}
+
+/* =========================================================================
+   NAVIGATION
+========================================================================= */
+var VIEW_TITLES = {
+  dashboard:['Dashboard','Workspace / Dashboard'],
+  create:['Create New Document','Workspace / Create New Document'],
+  templates:['Document Templates','Workspace / Document Templates'],
+  clauses:['Clause Library','Workspace / Clause Library'],
+  saved:['Saved Documents','Library / Saved Documents'],
+  recent:['Recent Documents','Library / Recent Documents'],
+  search:['Search','Library / Search'],
+  settings:['Settings','System / Settings']
+};
+
+function navigateTo(view, opts){
+  state.view = view;
+  document.querySelectorAll('.view').forEach(function(v){ v.hidden = true; });
+  var el = document.getElementById('view-'+view);
+  if(el) el.hidden = false;
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.toggle('active', n.dataset.view===view); });
+  document.getElementById('topbarTitle').textContent = VIEW_TITLES[view][0];
+  document.getElementById('topbarPath').textContent = VIEW_TITLES[view][1];
+  if(view==='dashboard') renderDashboard();
+  if(view==='create'){
+    if(opts && opts.typeId){ startWizard(opts.typeId); }
+    else { document.getElementById('createIntro').hidden = false; document.getElementById('wizardWrap').hidden = true; renderCreateTypeGrid(); }
+  }
+  if(view==='templates') renderTemplatesGrid();
+  if(view==='clauses') renderClauseLibraryView();
+  if(view==='saved') renderSavedView();
+  if(view==='recent') renderRecentView();
+  if(view==='search') renderSearchView();
+  if(view==='settings') renderSettingsView();
+  window.scrollTo(0,0);
+}
+
+document.getElementById('navList').addEventListener('click', function(e){
+  var btn = e.target.closest('.nav-item');
+  if(!btn) return;
+  navigateTo(btn.dataset.view);
+});
+document.addEventListener('click', function(e){
+  var link = e.target.closest('[data-view-link]');
+  if(link){ navigateTo(link.dataset.viewLink); }
+});
+document.getElementById('btnNewDoc').addEventListener('click', function(){ navigateTo('create'); });
+
+/* =========================================================================
+   DASHBOARD
+========================================================================= */
+function renderDashboard(){
+  var docs = getDocuments();
+  var drafts = docs.filter(function(d){return d.status==='draft';}).length;
+  var finals = docs.filter(function(d){return d.status==='final';}).length;
+  var lib = getClauseLibrary();
+
+  var stats = [
+    {n: docs.length, l:'Total Documents Created'},
+    {n: drafts, l:'Drafts in Progress'},
+    {n: finals, l:'Finalized Documents'},
+    {n: lib.length, l:'Clauses in Library'}
+  ];
+  document.getElementById('dashStats').innerHTML = stats.map(function(s){
+    return '<div class="stat-card"><div class="stat-num">'+s.n+'</div><div class="stat-label">'+s.l+'</div></div>';
+  }).join('');
+
+  document.getElementById('dashCategories').innerHTML = DOCUMENT_TYPES.slice(0,8).map(typeCardHTML).join('') +
+    '<button class="btn btn-ghost btn-sm" data-view-link="templates" style="grid-column:1/-1;justify-self:start;">View all 16 categories →</button>';
+  bindTypeCardEvents(document.getElementById('dashCategories'));
+
+  var recent = docs.slice().sort(function(a,b){return b.updatedAt-a.updatedAt;}).slice(0,6);
+  document.getElementById('dashRecentTable').innerHTML = recent.length ? recentTableHTML(recent) : emptyState('No documents yet','Create your first document to see it here.','create');
+  bindDocTableEvents(document.getElementById('dashRecentTable'));
+}
+
+function typeCardHTML(t){
+  return '<button class="doc-type-card" data-open-type="'+t.id+'">'+
+    '<div class="dt-icon">'+t.code+'</div>'+
+    '<h3>'+t.name+'</h3>'+
+    '<p>'+t.blurb+'</p>'+
+    '<div class="dt-go">Create this document →</div>'+
+  '</button>';
+}
+function bindTypeCardEvents(container){
+  container.querySelectorAll('[data-open-type]').forEach(function(b){
+    b.addEventListener('click', function(){ navigateTo('create', {typeId:b.dataset.openType}); });
+  });
+}
+function emptyState(title, msg, viewLink){
+  return '<div class="empty-state"><div class="es-icon">◧</div><h4>'+title+'</h4><p>'+msg+'</p>'+
+    (viewLink ? '<button class="btn btn-primary btn-sm" data-view-link="'+viewLink+'">+ New Document</button>' : '')+'</div>';
+}
+function recentTableHTML(docs){
+  var rows = docs.map(function(d){
+    var t = TYPE_MAP[d.typeId];
+    return '<tr>'+
+      '<td>'+esc(d.title)+'<div class="badge-code">'+esc(d.docNumber)+'</div></td>'+
+      '<td>'+(t?t.name:'—')+'</td>'+
+      '<td><span class="pill '+(d.status==='final'?'pill-final':'pill-draft')+'">'+(d.status==='final'?'Final':'Draft')+'</span></td>'+
+      '<td>'+new Date(d.updatedAt).toLocaleDateString()+'</td>'+
+      '<td style="text-align:right;">'+
+        '<button class="btn btn-sm btn-ghost" data-edit-doc="'+d.id+'">Open</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('');
+  return '<table class="table"><tr><th>Title</th><th>Type</th><th>Status</th><th>Updated</th><th></th></tr>'+rows+'</table>';
+}
+function bindDocTableEvents(container){
+  container.querySelectorAll('[data-edit-doc]').forEach(function(b){
+    b.addEventListener('click', function(){ openExistingDocument(b.dataset.editDoc); });
+  });
+  container.querySelectorAll('[data-dup-doc]').forEach(function(b){
+    b.addEventListener('click', function(){ duplicateDocument(b.dataset.dupDoc); });
+  });
+  container.querySelectorAll('[data-del-doc]').forEach(function(b){
+    b.addEventListener('click', function(){
+      confirmDialog('Delete document?','This action cannot be undone. The document will be permanently removed from local storage.', function(){
+        deleteDocument(b.dataset.delDoc);
+      });
+    });
+  });
+}
+
+/* =========================================================================
+   CREATE / TEMPLATES GRID
+========================================================================= */
+function renderCreateTypeGrid(){
+  var wrap = document.getElementById('createTypeGrid');
+  wrap.innerHTML = DOCUMENT_TYPES.map(typeCardHTML).join('');
+  bindTypeCardEvents(wrap);
+}
+function renderTemplatesGrid(){
+  var wrap = document.getElementById('templatesGrid');
+  wrap.innerHTML = DOCUMENT_TYPES.map(typeCardHTML).join('');
+  bindTypeCardEvents(wrap);
+  wrap.querySelectorAll('[data-open-type]').forEach(function(b){
+    b.addEventListener('click', function(){ navigateTo('create', {typeId:b.dataset.openType}); });
+  });
+}
+
+/* =========================================================================
+   WIZARD
+========================================================================= */
+var STEP_LABELS = ['Document Type','Information','Clauses','Preview','Final Document'];
+
+function startWizard(typeId){
+  state.wizard = freshWizard(typeId);
+  document.getElementById('createIntro').hidden = true;
+  document.getElementById('wizardWrap').hidden = false;
+  renderWizard();
+}
+function openExistingDocument(docId){
+  var docs = getDocuments();
+  var d = docs.find(function(x){return x.id===docId;});
+  if(!d){ toast('Document not found.','error'); return; }
+  state.wizard = {
+    docId:d.id, step:4, typeId:d.typeId, fields:JSON.parse(JSON.stringify(d.fields)),
+    parties:JSON.parse(JSON.stringify(d.parties)), selectedClauses:JSON.parse(JSON.stringify(d.selectedClauses)),
+    status:d.status
+  };
+  navigateTo('create');
+  document.getElementById('createIntro').hidden = true;
+  document.getElementById('wizardWrap').hidden = false;
+  renderWizard();
+}
+
+function renderStepper(){
+  var w = state.wizard;
+  var type = TYPE_MAP[w.typeId];
+  var maxStep = type.hasClauseLibrary===false ? 4 : 5; // some types skip clause step numbering but we still show 5 labels; clause step auto no-op
+  var html = '';
+  STEP_LABELS.forEach(function(lbl, i){
+    var n = i+1;
+    var cls = n===w.step ? 'active' : (n<w.step ? 'done':'');
+    html += '<div class="step '+cls+'"><div class="num">'+(n<w.step?'✓':n)+'</div><div class="lbl">'+lbl+'</div></div>';
+    if(n<5) html += '<div class="step-sep"></div>';
+  });
+  document.getElementById('stepperBar').innerHTML = html;
+}
+
+function renderWizard(){
+  renderStepper();
+  var w = state.wizard, type = TYPE_MAP[w.typeId];
+  var body = document.getElementById('wizardBody');
+  if(w.step===1) body.innerHTML = wizardStep1();
+  else if(w.step===2) body.innerHTML = wizardStep2(type);
+  else if(w.step===3) body.innerHTML = wizardStep3(type);
+  else if(w.step===4) body.innerHTML = wizardStep4(type);
+  else if(w.step===5) body.innerHTML = wizardStep5(type);
+  bindWizardEvents();
+}
+
+function wizardStep1(){
+  var w = state.wizard, type = TYPE_MAP[w.typeId];
+  return '<div class="card card-pad">'+
+    '<div class="section-title">Document Type</div>'+
+    '<div class="section-sub">You are creating a <strong>'+type.name+'</strong>. You may switch the type below before proceeding.</div>'+
+    '<div class="grid grid-3" id="switchTypeGrid">'+DOCUMENT_TYPES.map(function(t){
+      return '<button class="doc-type-card" data-switch-type="'+t.id+'" style="'+(t.id===type.id?'border-color:var(--brass);':'')+'"><div class="dt-icon">'+t.code+'</div><h3>'+t.name+'</h3><p>'+t.blurb+'</p></button>';
+    }).join('')+'</div>'+
+    '<div class="wizard-actions"><span></span><button class="btn btn-primary" id="toStep2">Continue to Information →</button></div>'+
+  '</div>';
+}
+
+function wizardStep2(type){
+  var w = state.wizard;
+  var fields = commonFields(type).concat(type.specificFields||[]);
+  var partiesLabel = type.partiesMode==='single' ? type.roles[0] : (type.partiesMode==='fixed2' ? 'Parties' : type.roleSingular+'s');
+  var html = '<div class="card card-pad"><div class="section-title">Information — '+type.name+'</div>';
+  html += '<div class="section-sub">Fields marked <span class="req">*</span> are required.</div>';
+
+  html += '<h4 style="font-family:var(--serif);margin:6px 0 10px;">'+partiesLabel+'</h4>';
+  html += '<div id="partiesWrap">'+renderPartiesHTML(type, w)+'</div>';
+  if(type.partiesMode==='repeatable'){
+    html += '<button class="btn btn-sm" id="btnAddParty" type="button">+ Add '+type.roleSingular+'</button>';
+  }
+
+  html += '<h4 style="font-family:var(--serif);margin:24px 0 10px;">Document Details</h4>';
+  html += '<div class="field-row2">'+fields.map(function(f){ return fieldHTML(f, w.fields[f.id]); }).join('')+'</div>';
+
+  html += '<div class="wizard-actions"><button class="btn" id="toStep1Back">← Back</button><button class="btn btn-primary" id="toStep3">Continue →</button></div></div>';
+  return html;
+}
+
+function renderPartiesHTML(type, w){
+  return w.parties.map(function(p, idx){
+    var extra = (type.partyExtraFields||[]).map(function(f){
+      return fieldHTML({id:f.id,label:f.label,type:f.type,required:f.required}, p[f.id], idx, true);
+    }).join('');
+    return '<div class="party-block" data-party-idx="'+idx+'">'+
+      '<div class="party-head"><h4>'+esc(p.role)+'</h4>'+
+      (type.partiesMode==='repeatable' && w.parties.length > (type.minParties||2) ? '<button class="btn icon-btn remove-party" data-remove-party="'+idx+'" type="button">✕ Remove</button>' : '')+
+      '</div>'+
+      '<div class="field-row2">'+
+        fieldHTML({id:'name',label:'Full Name / Entity Name',type:T,required:true}, p.name, idx, true)+
+        fieldHTML({id:'idNumber',label:'ID / Registration Number',type:T}, p.idNumber, idx, true)+
+        fieldHTML({id:'contact',label:'Contact (Phone / Email)',type:T,required:true}, p.contact, idx, true)+
+        fieldHTML({id:'address',label:'Address',type:TA,required:true}, p.address, idx, true)+
+      '</div>'+extra+
+    '</div>';
+  }).join('');
+}
+
+function fieldHTML(f, value, partyIdx, isParty){
+  value = value===undefined ? '' : value;
+  var idAttr = isParty ? 'p'+partyIdx+'_'+f.id : 'f_'+f.id;
+  var dataAttrs = isParty ? ' data-party-field="'+f.id+'" data-party-idx="'+partyIdx+'"' : ' data-field="'+f.id+'"';
+  var inputHtml = '';
+  if(f.type===TA){
+    inputHtml = '<textarea id="'+idAttr+'"'+dataAttrs+' placeholder="'+esc(f.placeholder||'')+'">'+esc(value)+'</textarea>';
+  } else {
+    inputHtml = '<input type="'+(f.type===N?'number':(f.type===D?'date':'text'))+'" id="'+idAttr+'"'+dataAttrs+' placeholder="'+esc(f.placeholder||'')+'" value="'+esc(value)+'">';
+  }
+  return '<div class="field" data-field-wrap="'+idAttr+'"><label>'+f.label+(f.required?'<span class="req">*</span>':'')+'</label>'+inputHtml+'<div class="error-msg">This field is required.</div></div>';
+}
+
+function wizardStep3(type){
+  var w = state.wizard;
+  if(type.hasClauseLibrary===false){
+    return '<div class="card card-pad"><div class="section-title">Clauses</div><div class="section-sub">This document type does not use the general clause library — its standard clauses are generated automatically from the information provided in the previous step.</div>'+
+      '<div class="wizard-actions"><button class="btn" id="toStep2Back">← Back</button><button class="btn btn-primary" id="toStep4">Continue to Preview →</button></div></div>';
+  }
+  var lib = getClauseLibrary();
+  var selectedIds = w.selectedClauses.map(function(c){return c.id;});
+  var html = '<div class="card card-pad"><div class="section-title">Select Clauses</div><div class="section-sub">Check the clauses to include. You can edit wording, reorder, or add a custom clause just for this document.</div>';
+  html += '<div class="clause-list" id="clauseSelectList">';
+  lib.forEach(function(c){
+    var checked = selectedIds.indexOf(c.id) > -1;
+    html += clauseSelectItemHTML(c, checked);
+  });
+  html += '</div>';
+  html += '<div class="tag-input-row" style="margin-top:16px;"><input type="text" id="inlineCustomClauseTitle" placeholder="Custom clause title for this document"><button class="btn" id="btnAddInlineClause" type="button">+ Add &amp; Select</button></div>';
+  html += '<div class="wizard-actions"><button class="btn" id="toStep2Back">← Back</button><button class="btn btn-primary" id="toStep4">Continue to Preview →</button></div></div>';
+  return html;
+}
+
+function clauseSelectItemHTML(c, checked){
+  return '<div class="clause-item" data-clause-id="'+c.id+'">'+
+    '<div class="ci-top">'+
+      '<input type="checkbox" '+(checked?'checked':'')+' data-toggle-clause="'+c.id+'">'+
+      '<div class="ci-title">'+esc(c.title)+'</div>'+
+      '<div class="ci-actions"><button class="icon-btn" data-edit-clause-text="'+c.id+'" title="Edit wording">✎</button></div>'+
+    '</div>'+
+    '<div class="ci-text" data-clause-text-view="'+c.id+'">'+esc(c.text)+'</div>'+
+  '</div>';
+}
+
+function wizardStep4(type){
+  var w = state.wizard;
+  var built = buildDocument(w, type);
+  var html = '<div class="card card-pad">';
+  html += '<div class="section-title">Live Preview</div><div class="section-sub">Review the generated document. You can go back to edit information or clauses, or proceed to finalize.</div>';
+  html += '<div class="preview-toolbar">'+
+    '<button class="btn" id="toStep3Back">← Edit Clauses</button>'+
+    '<button class="btn" id="toStep2FromPreview">← Edit Information</button>'+
+    '<button class="btn" id="btnSaveDraftMid">Save Draft</button>'+
+  '</div>';
+  html += '<div id="printArea"><div class="doc-page">'+built.html+'</div></div>';
+  html += '<div class="wizard-actions"><span></span><button class="btn btn-primary" id="toStep5">Proceed to Final Document →</button></div>';
+  html += '</div>';
+  return html;
+}
+
+function wizardStep5(type){
+  var w = state.wizard;
+  var built = buildDocument(w, type);
+  var html = '<div class="card card-pad">';
+  html += '<div class="section-title">Final Document</div>';
+  html += '<div class="section-sub">Document Number: <span class="badge-code">'+esc(w.docId ? (getDocuments().find(function(d){return d.id===w.docId;})||{}).docNumber||'' : '(assigned on save)')+'</span></div>';
+  html += '<div class="preview-toolbar">'+
+    '<button class="btn" id="printDocBtn">🖶 Print</button>'+
+    '<button class="btn" id="pdfDocBtn">⇩ Download PDF</button>'+
+    '<button class="btn" id="downloadWordBtn">⇩ Download Word</button>'+
+    '<button class="btn" id="copyDocBtn">⧉ Copy Text</button>'+
+    '<button class="btn" id="downloadHtmlBtn">⇩ Download HTML</button>'+
+    '<button class="btn btn-brass" id="saveFinalBtn">✓ Save as Final</button>'+
+    '<button class="btn" id="saveDraftFinalBtn">Save Draft</button>'+
+    '<button class="btn btn-danger" id="resetDocBtn">Reset</button>'+
+  '</div>';
+  html += '<div id="printArea"><div class="doc-page">'+built.html+'</div></div>';
+  html += '<div class="wizard-actions"><button class="btn" id="toStep4Back">← Back to Preview</button><button class="btn btn-ghost" data-view-link="saved">Go to Saved Documents →</button></div>';
+  html += '</div>';
+  return html;
+}
+
+/* ---- wizard event binding ---- */
+function bindWizardEvents(){
+  var w = state.wizard, type = TYPE_MAP[w.typeId];
+  var body = document.getElementById('wizardBody');
+
+  body.querySelectorAll('[data-switch-type]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var newType = b.dataset.switchType;
+      if(newType !== w.typeId){
+        // freshWizard auto-populates governingLaw from GOVERNING_LAW_MAP
+        state.wizard = freshWizard(newType);
+        renderWizard();
+      }
+    });
+  });
+  var toStep2 = document.getElementById('toStep2'); if(toStep2) toStep2.addEventListener('click', function(){ w.step=2; renderWizard(); });
+  var toStep1Back = document.getElementById('toStep1Back'); if(toStep1Back) toStep1Back.addEventListener('click', function(){ collectStep2Fields(); w.step=1; renderWizard(); });
+  var toStep2Back = document.getElementById('toStep2Back'); if(toStep2Back) toStep2Back.addEventListener('click', function(){ w.step=2; renderWizard(); });
+  var toStep2FromPreview = document.getElementById('toStep2FromPreview'); if(toStep2FromPreview) toStep2FromPreview.addEventListener('click', function(){ w.step=2; renderWizard(); });
+  var toStep3Back = document.getElementById('toStep3Back'); if(toStep3Back) toStep3Back.addEventListener('click', function(){ w.step=3; renderWizard(); });
+  var toStep4Back = document.getElementById('toStep4Back'); if(toStep4Back) toStep4Back.addEventListener('click', function(){ w.step=4; renderWizard(); });
+
+  var toStep3 = document.getElementById('toStep3');
+  if(toStep3) toStep3.addEventListener('click', function(){
+    if(!collectStep2Fields()){ toast('Please complete all required fields.','error'); return; }
+    w.step=3; renderWizard();
+  });
+  var toStep4 = document.getElementById('toStep4');
+  if(toStep4) toStep4.addEventListener('click', function(){ w.step=4; renderWizard(); });
+  var toStep5 = document.getElementById('toStep5');
+  if(toStep5) toStep5.addEventListener('click', function(){ w.step=5; renderWizard(); });
+
+  var addParty = document.getElementById('btnAddParty');
+  if(addParty) addParty.addEventListener('click', function(){
+    collectStep2Fields(true);
+    w.parties.push({role:type.roleSingular+' '+(w.parties.length+1), name:'',address:'',contact:'',idNumber:''});
+    renderWizard();
+  });
+  body.querySelectorAll('[data-remove-party]').forEach(function(b){
+    b.addEventListener('click', function(){
+      collectStep2Fields(true);
+      w.parties.splice(parseInt(b.dataset.removeParty,10),1);
+      w.parties.forEach(function(p,i){ if(/^ (Partner|Party|Subscriber|Director) /.test(' '+p.role)){} });
+      renderWizard();
+    });
+  });
+
+  // clause step
+  body.querySelectorAll('[data-toggle-clause]').forEach(function(cb){
+    cb.addEventListener('change', function(){
+      var lib = getClauseLibrary();
+      var c = lib.find(function(x){return x.id===cb.dataset.toggleClause;});
+      if(!c) return;
+      var idx = w.selectedClauses.findIndex(function(x){return x.id===c.id;});
+      if(cb.checked){ if(idx===-1) w.selectedClauses.push({id:c.id,title:c.title,text:c.text}); }
+      else { if(idx>-1) w.selectedClauses.splice(idx,1); }
+    });
+  });
+  body.querySelectorAll('[data-edit-clause-text]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.dataset.editClauseText;
+      var viewDiv = body.querySelector('[data-clause-text-view="'+id+'"]');
+      if(viewDiv.querySelector('textarea')) return;
+      var current = viewDiv.textContent;
+      viewDiv.innerHTML = '<textarea>'+esc(current)+'</textarea><button class="btn btn-sm btn-primary" style="margin-top:8px;" data-save-clause-text="'+id+'">Save wording</button>';
+      viewDiv.querySelector('[data-save-clause-text]').addEventListener('click', function(){
+        var newText = viewDiv.querySelector('textarea').value;
+        var sel = w.selectedClauses.find(function(x){return x.id===id;});
+        if(sel) sel.text = newText;
+        viewDiv.innerHTML = esc(newText);
+      });
+    });
+  });
+  var btnAddInline = document.getElementById('btnAddInlineClause');
+  if(btnAddInline) btnAddInline.addEventListener('click', function(){
+    var input = document.getElementById('inlineCustomClauseTitle');
+    var title = input.value.trim();
+    if(!title){ toast('Enter a clause title first.','warn'); return; }
+    var id = 'custom_'+uid();
+    var newClause = {id:id, title:title, text:'[Enter clause wording]'};
+    var lib = getClauseLibrary(); lib.push(newClause); setClauseLibrary(lib);
+    w.selectedClauses.push({id:id, title:title, text:newClause.text});
+    renderWizard();
+  });
+
+  // preview/final buttons
+  var btnSaveDraftMid = document.getElementById('btnSaveDraftMid');
+  if(btnSaveDraftMid) btnSaveDraftMid.addEventListener('click', function(){ saveCurrentDocument('draft'); });
+  var printBtn = document.getElementById('printDocBtn'); if(printBtn) printBtn.addEventListener('click', function(){ window.print(); });
+  var pdfBtn = document.getElementById('pdfDocBtn'); if(pdfBtn) pdfBtn.addEventListener('click', function(){ downloadDocumentPDF(); });
+  var wordBtn = document.getElementById('downloadWordBtn'); if(wordBtn) wordBtn.addEventListener('click', function(){ downloadDocumentWord(); });
+  var copyBtn = document.getElementById('copyDocBtn'); if(copyBtn) copyBtn.addEventListener('click', function(){ copyDocumentText(); });
+  var dlBtn = document.getElementById('downloadHtmlBtn'); if(dlBtn) dlBtn.addEventListener('click', function(){ downloadDocumentHTML(); });
+  var saveFinalBtn = document.getElementById('saveFinalBtn'); if(saveFinalBtn) saveFinalBtn.addEventListener('click', function(){
+    confirmDialog('Finalize document?','Once marked Final, the document is considered ready for review by a legal professional prior to execution. You can still edit it later if needed.', function(){
+      saveCurrentDocument('final');
+    });
+  });
+  var saveDraftFinalBtn = document.getElementById('saveDraftFinalBtn'); if(saveDraftFinalBtn) saveDraftFinalBtn.addEventListener('click', function(){ saveCurrentDocument('draft'); });
+  var resetBtn = document.getElementById('resetDocBtn'); if(resetBtn) resetBtn.addEventListener('click', function(){
+    confirmDialog('Reset this document?','All unsaved information, party details and clause selections for this document will be cleared.', function(){
+      state.wizard = freshWizard(type.id); renderWizard();
+    });
+  });
+}
+
+function collectStep2Fields(skipValidation){
+  var w = state.wizard, type = TYPE_MAP[w.typeId];
+  var body = document.getElementById('wizardBody');
+  if(!body) return true;
+  var valid = true;
+  // party fields
+  body.querySelectorAll('[data-party-field]').forEach(function(el){
+    var idx = parseInt(el.dataset.partyIdx,10);
+    var key = el.dataset.partyField;
+    if(w.parties[idx]) w.parties[idx][key] = el.value;
+  });
+  // common + specific fields
+  body.querySelectorAll('[data-field]').forEach(function(el){
+    w.fields[el.dataset.field] = el.value;
+  });
+  if(skipValidation) return true;
+  // validation
+  var fields = commonFields(type).concat(type.specificFields||[]);
+  body.querySelectorAll('.field[data-field-wrap]').forEach(function(fw){ fw.classList.remove('error'); });
+  fields.forEach(function(f){
+    if(f.required && !String(w.fields[f.id]||'').trim()){
+      valid = false;
+      var fw = body.querySelector('[data-field-wrap="f_'+f.id+'"]');
+      if(fw) fw.classList.add('error');
+    }
+  });
+  w.parties.forEach(function(p, idx){
+    ['name','address','contact'].forEach(function(k){
+      if(!String(p[k]||'').trim()){
+        valid = false;
+        var fw = body.querySelector('[data-field-wrap="p'+idx+'_'+k+'"]');
+        if(fw) fw.classList.add('error');
+      }
+    });
+    (type.partyExtraFields||[]).forEach(function(f){
+      if(f.required && !String(p[f.id]||'').trim()){
+        valid = false;
+        var fw = body.querySelector('[data-field-wrap="p'+idx+'_'+f.id+'"]');
+        if(fw) fw.classList.add('error');
+      }
+    });
+  });
+  return valid;
+}
+
+/* Make sure clicking away from Step2 still stores latest typed values even without explicit collect call */
+document.addEventListener('input', function(e){
+  if(!state.wizard) return;
+  if(e.target.matches('[data-field]')){ state.wizard.fields[e.target.dataset.field] = e.target.value; }
+  if(e.target.matches('[data-party-field]')){
+    var idx = parseInt(e.target.dataset.partyIdx,10), key = e.target.dataset.partyField;
+    if(state.wizard.parties[idx]) state.wizard.parties[idx][key] = e.target.value;
+  }
+});
+
+/* =========================================================================
+   DOCUMENT BUILD ENGINE
+========================================================================= */
+function buildContext(w, type){
+  var ctx = {};
+  Object.keys(w.fields).forEach(function(k){ ctx[toToken(k)] = w.fields[k]; });
+  ctx.DATE_FORMATTED = formatDate(w.fields.date);
+  ctx.EFFECTIVE_DATE = formatDate(w.fields.effectiveDate);
+  ctx.__deliveryDateRaw = w.fields.deliveryDate;
+  ctx.NOTICE_PERIOD = w.fields.noticePeriod || '30';
+  w.parties.forEach(function(p, i){
+    var n = i+1;
+    ctx['PARTY_'+n+'_NAME'] = p.name;
+    ctx['PARTY_'+n+'_ADDRESS'] = p.address;
+    ctx['PARTY_'+n+'_CONTACT'] = p.contact;
+    ctx['PARTY_'+n+'_ID'] = p.idNumber;
+    ctx['PARTY_'+n+'_ROLE'] = p.role;
+  });
+  return ctx;
+}
+
+function buildDocument(w, type){
+  var ctx = buildContext(w, type);
+  var lib = getClauseLibrary();
+  var settings = loadJSON(K_SETTINGS, {});
+  var docTitle = w.fields.docTitle || type.name;
+
+  var html = '';
+  html += '<div class="doc-num-tag">Draft Ref: '+(w.docId ? ((getDocuments().find(function(d){return d.id===w.docId;})||{}).docNumber||'—') : 'DRAFT — NOT YET SAVED')+'</div>';
+  html += '<div class="doc-title">'+esc(docTitle)+'</div>';
+  html += '<div class="doc-subtitle">'+esc(type.name)+(settings.firmName?(' · Prepared via '+esc(settings.firmName)):'')+'</div>';
+
+  if(type.isAffidavitStyle){
+    html += '<p>'+fillTemplate(type.recital(ctx), ctx)+'</p>';
+    html += '<ol>'+ type.clauses(ctx, w).map(function(c){ return '<li>'+esc(fillTemplate(c, ctx))+'</li>'; }).join('') +'</ol>';
+    html += '<div class="doc-section-h">Verification</div>';
+    html += '<p>Verified at '+(w.fields.place||'[place]')+' on this '+(w.fields.date?formatDate(w.fields.date):'[date]')+' that the contents of the above are true and correct to the best of my knowledge and belief, and no part of it is false and nothing material has been concealed therefrom.</p>';
+    html += '<div class="sig-grid"><div class="sig-block"><div class="sig-line"></div><div class="sig-cap">Signature of '+esc(w.parties[0].role)+'<br>'+esc(w.parties[0].name||'')+'</div></div></div>';
+    return {html: html};
+  }
+
+  html += '<p>This '+esc(type.name)+' ("Document") is made and executed at <strong>'+esc(w.fields.place||'[place]')+'</strong> on this '+esc(w.fields.date?formatDate(w.fields.date):'[date]')+', by and between:</p>';
+
+  w.parties.forEach(function(p, i){
+    html += '<p class="party-line"><strong>'+esc(p.name||('['+p.role+' name]'))+'</strong>, '+esc(p.role)+', residing / having its registered office at '+esc(p.address||'[address]')+(p.idNumber?(', bearing ID/Registration No. '+esc(p.idNumber)):'')+', contactable at '+esc(p.contact||'[contact]')+(i<w.parties.length-1 ? (i===w.parties.length-2 ? ' <em>AND</em>' : ';') : '.')+'</p>';
+  });
+  html += '<p>(the above, collectively "the Parties" and individually "a Party").</p>';
+
+  html += '<div class="doc-section-h">Recitals</div>';
+  html += '<p>'+fillTemplate(type.recital(ctx), ctx)+'</p>';
+
+  html += '<div class="doc-section-h">Definitions</div>';
+  html += '<p>In this Document, unless the context otherwise requires: "Effective Date" means '+esc(ctx.EFFECTIVE_DATE)+'; "Document" means this '+esc(type.name)+' together with its schedules and annexures; and references to "the Parties" shall bear the meaning set out above.</p>';
+
+  html += '<div class="doc-section-h">Terms &amp; Conditions</div>';
+  var allClauses = [];
+  (type.clauses ? type.clauses(ctx, w) : []).forEach(function(c){ allClauses.push(fillTemplate(c, ctx)); });
+  if(w.fields.paymentTerms) allClauses.push('Payment Terms: '+fillTemplate(w.fields.paymentTerms, ctx));
+  if(w.fields.terminationConditions) allClauses.push('Termination Conditions: '+fillTemplate(w.fields.terminationConditions, ctx));
+  if(w.fields.governingLaw) allClauses.push('Governing Law: This Document shall be governed by and construed in accordance with '+fillTemplate(w.fields.governingLaw, ctx)+'.');
+  if(w.fields.jurisdiction) allClauses.push('Jurisdiction: The courts at '+fillTemplate(w.fields.jurisdiction, ctx)+' shall have exclusive jurisdiction over matters arising out of this Document.');
+  if(w.fields.disputeResolutionMech) allClauses.push('Dispute Resolution: '+fillTemplate(w.fields.disputeResolutionMech, ctx)+'.');
+  (w.selectedClauses||[]).forEach(function(c){ allClauses.push(c.title+': '+fillTemplate(c.text, ctx)); });
+  html += '<ol>'+allClauses.map(function(c){ return '<li>'+esc(c)+'</li>'; }).join('')+'</ol>';
+
+  if(type.schedule){
+    var sch = type.schedule(ctx, w);
+    html += '<div class="doc-section-h">'+sch.title+'</div>'+sch.html;
+  }
+  if(w.fields.additionalTerms){
+    html += '<div class="doc-section-h">Annexure I — Additional Terms</div><p>'+esc(fillTemplate(w.fields.additionalTerms, ctx))+'</p>';
+  }
+
+  html += '<div class="doc-section-h">In Witness Whereof</div>';
+  html += '<p>IN WITNESS WHEREOF, the Parties have executed this Document on the day, month and year first above written, at '+esc(w.fields.place||'[place]')+'.</p>';
+
+  html += '<div class="sig-grid">';
+  w.parties.forEach(function(p){
+    html += '<div class="sig-block"><div class="sig-line"></div><div class="sig-cap">Signature<br><strong>'+esc(p.name||'[name]')+'</strong><br>'+esc(p.role)+'<br>Date: ____________</div></div>';
+  });
+  html += '</div>';
+
+  html += '<div class="doc-section-h">Witnesses</div>';
+  html += '<div class="sig-grid">'+
+    '<div class="sig-block"><div class="sig-line"></div><div class="sig-cap">Witness 1 — Name, Signature &amp; Address</div></div>'+
+    '<div class="sig-block"><div class="sig-line"></div><div class="sig-cap">Witness 2 — Name, Signature &amp; Address</div></div>'+
+  '</div>';
+
+  return {html: html};
+}
+
+function documentPlainText(){
+  var el = document.querySelector('#printArea .doc-page');
+  if(!el) return '';
+  return el.innerText;
+}
+function copyDocumentText(){
+  var text = documentPlainText();
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ toast('Document text copied to clipboard.','success'); }, function(){ toast('Could not copy — please select and copy manually.','error'); });
+  } else {
+    toast('Clipboard not available in this browser.','error');
+  }
+}
+function downloadDocumentHTML(){
+  var w = state.wizard, type = TYPE_MAP[w.typeId];
+  var built = buildDocument(w, type);
+  var full = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+esc(w.fields.docTitle||type.name)+'</title>'+
+    '<style>body{font-family:Georgia,serif;max-width:800px;margin:40px auto;line-height:1.7;color:#1a1a1a;padding:0 20px;}'+
+    '.doc-title{text-align:center;font-size:20px;font-weight:700;text-transform:uppercase;}'+
+    '.doc-subtitle{text-align:center;font-size:12px;color:#666;margin-bottom:24px;font-family:sans-serif;}'+
+    '.doc-section-h{font-size:14px;font-weight:700;text-transform:uppercase;margin:24px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px;}'+
+    'p{text-align:justify;} ol li{margin-bottom:8px;text-align:justify;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ccc;padding:8px;font-size:13px;}'+
+    '.sig-grid{display:flex;gap:30px;margin-top:16px;flex-wrap:wrap;} .sig-block{flex:1;min-width:220px;} .sig-line{border-bottom:1px solid #333;height:32px;} .doc-num-tag{font-size:11px;color:#888;text-align:right;}</style>'+
+    '</head><body>'+built.html+'</body></html>';
+  var blob = new Blob([full], {type:'text/html'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (w.fields.docTitle||type.name).replace(/[^a-z0-9]+/gi,'_')+'.html';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('Document downloaded as HTML.','success');
+}
+
+function downloadDocumentPDF(){
+  toast('Opening print dialog — choose "Save as PDF" as the destination.','success');
+  setTimeout(function(){ window.print(); }, 300);
+}
+
+function downloadDocumentWord(){
+  var w = state.wizard, type = TYPE_MAP[w.typeId];
+  var built = buildDocument(w, type);
+  var wordHtml =
+    '<html xmlns:o="urn:schemas-microsoft-com:office:office" '+
+    'xmlns:w="urn:schemas-microsoft-com:office:word" '+
+    'xmlns="http://www.w3.org/TR/REC-html40">'+
+    '<head><meta charset="UTF-8">'+
+    '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View>'+
+    '<w:Zoom>90</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->'+
+    '<style>'+
+      'body{font-family:Georgia,serif;font-size:12pt;line-height:1.7;color:#1a1a1a;margin:2cm 2.5cm;}'+
+      '.doc-title{text-align:center;font-size:16pt;font-weight:bold;text-transform:uppercase;margin-bottom:4pt;}'+
+      '.doc-subtitle{text-align:center;font-size:10pt;color:#666;margin-bottom:18pt;}'+
+      '.doc-section-h{font-size:11pt;font-weight:bold;text-transform:uppercase;margin:18pt 0 6pt;border-bottom:1pt solid #ccc;padding-bottom:3pt;}'+
+      'p{text-align:justify;margin:0 0 9pt;}'+
+      'ol{margin:0 0 9pt;padding-left:18pt;}'+
+      'ol li{margin-bottom:7pt;text-align:justify;}'+
+      'table{border-collapse:collapse;width:100%;margin-bottom:9pt;}'+
+      'td,th{border:1pt solid #bbb;padding:6pt;font-size:10pt;}'+
+      'th{background:#f2f2f2;font-weight:bold;}'+
+      '.sig-grid{display:table;width:100%;margin-top:14pt;}'+
+      '.sig-block{display:table-cell;width:50%;padding-right:20pt;vertical-align:top;}'+
+      '.sig-line{border-bottom:1pt solid #333;height:26pt;margin-bottom:4pt;}'+
+      '.sig-cap{font-size:10pt;color:#444;}'+
+      '.doc-num-tag{font-size:9pt;color:#888;text-align:right;margin-bottom:10pt;}'+
+      '.party-line{margin-bottom:5pt;}'+
+    '</style>'+
+    '</head><body>'+built.html+'</body></html>';
+  var blob = new Blob(['\ufeff', wordHtml], {type:'application/msword'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (w.fields.docTitle||type.name).replace(/[^a-z0-9]+/gi,'_')+'.doc';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('Document downloaded as Word (.doc).','success');
+}
+
+function saveCurrentDocument(status){
+  var w = state.wizard, type = TYPE_MAP[w.typeId];
+  var docs = getDocuments();
+  var now = Date.now();
+  if(w.docId){
+    var existing = docs.find(function(d){return d.id===w.docId;});
+    if(existing){
+      existing.title = w.fields.docTitle || type.name;
+      existing.fields = JSON.parse(JSON.stringify(w.fields));
+      existing.parties = JSON.parse(JSON.stringify(w.parties));
+      existing.selectedClauses = JSON.parse(JSON.stringify(w.selectedClauses));
+      existing.status = status;
+      existing.updatedAt = now;
+      setDocuments(docs);
+      toast(status==='final' ? 'Document finalized and saved.' : 'Draft saved.', 'success');
+      renderWizard();
+      updateSidebarCounts();
+      return;
+    }
+  }
+  var newDoc = {
+    id: uid(),
+    docNumber: nextDocNumber(type.code),
+    typeId: type.id,
+    title: w.fields.docTitle || type.name,
+    fields: JSON.parse(JSON.stringify(w.fields)),
+    parties: JSON.parse(JSON.stringify(w.parties)),
+    selectedClauses: JSON.parse(JSON.stringify(w.selectedClauses)),
+    status: status,
+    createdAt: now,
+    updatedAt: now
+  };
+  docs.push(newDoc);
+  setDocuments(docs);
+  w.docId = newDoc.id;
+  toast(status==='final' ? 'Document finalized and saved.' : 'Draft saved.', 'success');
+  renderWizard();
+  updateSidebarCounts();
+}
+
+function duplicateDocument(id){
+  var docs = getDocuments();
+  var d = docs.find(function(x){return x.id===id;});
+  if(!d) return;
+  var type = TYPE_MAP[d.typeId];
+  var copy = JSON.parse(JSON.stringify(d));
+  copy.id = uid();
+  copy.docNumber = nextDocNumber(type.code);
+  copy.title = d.title + ' (Copy)';
+  copy.status = 'draft';
+  copy.createdAt = Date.now();
+  copy.updatedAt = Date.now();
+  docs.push(copy);
+  setDocuments(docs);
+  toast('Document duplicated.','success');
+  refreshCurrentListView();
+  updateSidebarCounts();
+}
+function deleteDocument(id){
+  var docs = getDocuments().filter(function(d){return d.id!==id;});
+  setDocuments(docs);
+  toast('Document deleted.','success');
+  refreshCurrentListView();
+  updateSidebarCounts();
+}
+function refreshCurrentListView(){
+  if(state.view==='dashboard') renderDashboard();
+  if(state.view==='saved') renderSavedView();
+  if(state.view==='recent') renderRecentView();
+  if(state.view==='search') renderSearchView();
+}
+
+/* =========================================================================
+   CLAUSE LIBRARY VIEW
+========================================================================= */
+function renderClauseLibraryView(){
+  var lib = getClauseLibrary();
+  var wrap = document.getElementById('libraryClauseList');
+  wrap.innerHTML = lib.map(function(c){
+    return '<div class="clause-item" data-lib-clause="'+c.id+'">'+
+      '<div class="ci-top">'+
+        '<div class="ci-title">'+esc(c.title)+'</div>'+
+        '<div class="ci-actions">'+
+          '<button class="icon-btn" data-lib-up="'+c.id+'" title="Move up">↑</button>'+
+          '<button class="icon-btn" data-lib-down="'+c.id+'" title="Move down">↓</button>'+
+          '<button class="icon-btn" data-lib-edit="'+c.id+'" title="Edit">✎</button>'+
+          '<button class="icon-btn" data-lib-del="'+c.id+'" title="Delete">✕</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="ci-text" data-lib-text="'+c.id+'">'+esc(c.text)+'</div>'+
+    '</div>';
+  }).join('');
+
+  wrap.querySelectorAll('[data-lib-up]').forEach(function(b){ b.addEventListener('click', function(){ moveLibClause(b.dataset.libUp,-1); }); });
+  wrap.querySelectorAll('[data-lib-down]').forEach(function(b){ b.addEventListener('click', function(){ moveLibClause(b.dataset.libDown,1); }); });
+  wrap.querySelectorAll('[data-lib-del]').forEach(function(b){
+    b.addEventListener('click', function(){
+      confirmDialog('Delete clause?','This clause will be removed from the library. It will not be removed from documents that already include it.', function(){
+        var l = getClauseLibrary().filter(function(x){return x.id!==b.dataset.libDel;});
+        setClauseLibrary(l); renderClauseLibraryView(); toast('Clause removed.','success');
+      });
+    });
+  });
+  wrap.querySelectorAll('[data-lib-edit]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var id = b.dataset.libEdit;
+      var view = wrap.querySelector('[data-lib-text="'+id+'"]');
+      if(view.querySelector('textarea')) return;
+      var current = view.textContent;
+      view.innerHTML = '<textarea>'+esc(current)+'</textarea><button class="btn btn-sm btn-primary" style="margin-top:8px;" data-lib-save="'+id+'">Save</button>';
+      view.querySelector('[data-lib-save]').addEventListener('click', function(){
+        var l = getClauseLibrary();
+        var c = l.find(function(x){return x.id===id;});
+        c.text = view.querySelector('textarea').value;
+        setClauseLibrary(l);
+        renderClauseLibraryView();
+        toast('Clause wording updated.','success');
+      });
+    });
+  });
+}
+function moveLibClause(id, dir){
+  var l = getClauseLibrary();
+  var idx = l.findIndex(function(x){return x.id===id;});
+  var newIdx = idx+dir;
+  if(newIdx<0 || newIdx>=l.length) return;
+  var tmp = l[idx]; l[idx]=l[newIdx]; l[newIdx]=tmp;
+  setClauseLibrary(l);
+  renderClauseLibraryView();
+}
+document.getElementById('btnAddClause').addEventListener('click', function(){
+  var input = document.getElementById('newClauseTitle');
+  var title = input.value.trim();
+  if(!title){ toast('Enter a clause title.','warn'); return; }
+  var l = getClauseLibrary();
+  l.push({id:'custom_'+uid(), title:title, text:'[Enter clause wording]'});
+  setClauseLibrary(l);
+  input.value='';
+  renderClauseLibraryView();
+  toast('Clause added to library.','success');
+});
+
+/* =========================================================================
+   SAVED / RECENT / SEARCH VIEWS
+========================================================================= */
+function fullDocTableHTML(docs, emptyMsg){
+  if(!docs.length) return emptyState('No documents found', emptyMsg||'Try adjusting your filters.', 'create');
+  var rows = docs.map(function(d){
+    var t = TYPE_MAP[d.typeId];
+    return '<tr>'+
+      '<td><strong>'+esc(d.title)+'</strong><div class="badge-code">'+esc(d.docNumber)+'</div></td>'+
+      '<td>'+(t?t.name:'—')+'</td>'+
+      '<td><span class="pill '+(d.status==='final'?'pill-final':'pill-draft')+'">'+(d.status==='final'?'Final':'Draft')+'</span></td>'+
+      '<td>'+new Date(d.createdAt).toLocaleDateString()+'</td>'+
+      '<td>'+new Date(d.updatedAt).toLocaleDateString()+'</td>'+
+      '<td style="text-align:right;white-space:nowrap;">'+
+        '<button class="btn btn-sm btn-ghost" data-edit-doc="'+d.id+'">Open</button> '+
+        '<button class="btn btn-sm btn-ghost" data-dup-doc="'+d.id+'">Duplicate</button> '+
+        '<button class="btn btn-sm btn-danger" data-del-doc="'+d.id+'">Delete</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('');
+  return '<table class="table"><tr><th>Title</th><th>Type</th><th>Status</th><th>Created</th><th>Updated</th><th></th></tr>'+rows+'</table>';
+}
+
+function renderSavedView(){
+  var typeSel = document.getElementById('filterType');
+  if(typeSel.options.length<=1){
+    DOCUMENT_TYPES.forEach(function(t){ var o=document.createElement('option'); o.value=t.id; o.textContent=t.name; typeSel.appendChild(o); });
+  }
+  function apply(){
+    var docs = getDocuments();
+    var tf = typeSel.value, sf = document.getElementById('filterStatus').value, q = document.getElementById('filterQuery').value.toLowerCase();
+    docs = docs.filter(function(d){
+      if(tf && d.typeId!==tf) return false;
+      if(sf && d.status!==sf) return false;
+      if(q){
+        var hay = (d.title+' '+d.parties.map(function(p){return p.name;}).join(' ')).toLowerCase();
+        if(hay.indexOf(q)===-1) return false;
+      }
+      return true;
+    });
+    docs.sort(function(a,b){return b.updatedAt-a.updatedAt;});
+    var wrap = document.getElementById('savedTableWrap');
+    wrap.innerHTML = fullDocTableHTML(docs);
+    bindDocTableEvents(wrap);
+  }
+  typeSel.onchange = apply;
+  document.getElementById('filterStatus').onchange = apply;
+  document.getElementById('filterQuery').oninput = apply;
+  apply();
+}
+function renderRecentView(){
+  var docs = getDocuments().slice().sort(function(a,b){return b.updatedAt-a.updatedAt;}).slice(0,10);
+  var wrap = document.getElementById('recentTableWrap');
+  wrap.innerHTML = fullDocTableHTML(docs, 'Create a document to see it appear here.');
+  bindDocTableEvents(wrap);
+}
+function renderSearchView(){
+  var input = document.getElementById('globalSearchInput');
+  function apply(){
+    var q = input.value.trim().toLowerCase();
+    var out = '';
+    if(q){
+      var docs = getDocuments().filter(function(d){
+        var hay = (d.title+' '+d.docNumber+' '+d.parties.map(function(p){return p.name;}).join(' ')).toLowerCase();
+        return hay.indexOf(q)>-1;
+      });
+      var types = DOCUMENT_TYPES.filter(function(t){ return t.name.toLowerCase().indexOf(q)>-1; });
+      var clauses = getClauseLibrary().filter(function(c){ return c.title.toLowerCase().indexOf(q)>-1 || c.text.toLowerCase().indexOf(q)>-1; });
+      out += '<div class="card card-pad" style="margin-bottom:16px;"><div class="section-title" style="font-size:14.5px;">Documents ('+docs.length+')</div>'+(docs.length?fullDocTableHTML(docs):'<div class="section-sub">No matching documents.</div>')+'</div>';
+      out += '<div class="card card-pad" style="margin-bottom:16px;"><div class="section-title" style="font-size:14.5px;">Templates ('+types.length+')</div><div class="grid grid-4">'+types.map(typeCardHTML).join('')+'</div></div>';
+      out += '<div class="card card-pad"><div class="section-title" style="font-size:14.5px;">Clauses ('+clauses.length+')</div>'+(clauses.length?clauses.map(function(c){return '<div class="clause-item"><div class="ci-title">'+esc(c.title)+'</div><div class="ci-text">'+esc(c.text)+'</div></div>';}).join(''):'<div class="section-sub">No matching clauses.</div>')+'</div>';
+    }
+    var results = document.getElementById('searchResults');
+    results.innerHTML = out;
+    bindDocTableEvents(results);
+    bindTypeCardEvents(results);
+  }
+  input.oninput = apply;
+  apply();
+}
+document.getElementById('quickSearch').addEventListener('input', function(e){
+  if(e.target.value.trim()){
+    navigateTo('search');
+    document.getElementById('globalSearchInput').value = e.target.value;
+    document.getElementById('globalSearchInput').dispatchEvent(new Event('input'));
+  }
+});
+
+/* =========================================================================
+   SETTINGS
+========================================================================= */
+function renderSettingsView(){
+  var s = loadJSON(K_SETTINGS, {});
+  document.getElementById('setFirmName').value = s.firmName||'';
+  document.getElementById('setPlace').value = s.place||'';
+  document.getElementById('setLaw').value = s.law||'';
+  document.getElementById('setJuris').value = s.juris||'';
+}
+document.getElementById('btnSaveSettings').addEventListener('click', function(){
+  saveJSON(K_SETTINGS, {
+    firmName: document.getElementById('setFirmName').value,
+    place: document.getElementById('setPlace').value,
+    law: document.getElementById('setLaw').value,
+    juris: document.getElementById('setJuris').value
+  });
+  toast('Settings saved.','success');
+});
+document.getElementById('btnExportAll').addEventListener('click', function(){
+  var data = { documents:getDocuments(), clauses:getClauseLibrary(), settings:loadJSON(K_SETTINGS,{}) };
+  var blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'pbtool_backup.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('Backup exported.','success');
+});
+document.getElementById('btnClearAll').addEventListener('click', function(){
+  confirmDialog('Erase all data?','This will permanently delete all saved documents, custom clauses and settings from this browser. This cannot be undone.', function(){
+    localStorage.removeItem(K_DOCS); localStorage.removeItem(K_CLAUSES); localStorage.removeItem(K_SETTINGS); localStorage.removeItem(K_COUNTER);
+    toast('All data erased.','success');
+    navigateTo('dashboard');
+    updateSidebarCounts();
+  });
+});
+
+/* =========================================================================
+   SIDEBAR COUNTS / INIT
+========================================================================= */
+function updateSidebarCounts(){
+  document.getElementById('cntSaved').textContent = getDocuments().length;
+}
+
+function init(){
+  getClauseLibrary();
+  updateSidebarCounts();
+  navigateTo('dashboard');
+}
+init();
+
+})();
+</script>
+</body>
+</html>
